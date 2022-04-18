@@ -1,0 +1,8 @@
+vowels = ["a", "e", "i", "o", "u", "A", "E", "I", "O", "U"]
+conjugation_exceptions = ["laufen", "saufen", "stehlen", "sehen", "zusehen" , "lesen", "empfehlen", "geschehen", "befehlen", "wissen"]
+persons = ["1st", "2nd", "3rd"]
+genera = ["masculine", "feminine", "neutral"]
+numbers = ["singular", "plural"]
+article_types = ["definite", "indefinite"]
+detached_affixes = ["zu", "aus", "ab", "ein", "nach"]
+list_of_preposition_types = ["local"]
