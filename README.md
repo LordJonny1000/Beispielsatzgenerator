@@ -1,2 +1,1 @@
 # Beispielsatzgenerator
-# Beispielsatzgenerator
