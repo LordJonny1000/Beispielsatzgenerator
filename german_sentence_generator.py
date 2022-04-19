@@ -11,7 +11,7 @@ import linguistics
 from utils import surface
 
 list_of_nouns = [part_of_speech.noun.from_list(x) for x in vocabulary.nouns.list_of_nouns]
-list_of_verbs = [part_of_speech.verb.from_list(x) for x in vocabulary.verbs0.list_of_verbs]
+list_of_verbs = [part_of_speech.verb.from_list(x) for x in vocabulary.verbs.list_of_verbs]
 list_of_adjectives = [part_of_speech.adjective.from_string(x) for x in vocabulary.adjectives.list_of_adjectives]
 list_of_person_names = [part_of_speech.person_name.from_list(x) for x in vocabulary.person_names.list_of_person_names]
 list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in vocabulary.prepositions.list_of_prepositions]
