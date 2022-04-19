@@ -12,6 +12,9 @@ class noun:
         self.ability_to_act = ability_to_act
         self.person = "3rd"
         self.number = numbers[random.randrange(2)]
+    @classmethod
+    def from_list(cls, list_entry):
+        return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
     def declension(self, number, case="nominative"):
         if number == "plural":  
             if self.strong_or_weak == "strong":
@@ -107,7 +110,10 @@ class verb:
         if self.word[-2] == "e" and self.word[-1] == "n":
             self.lemma = self.word[:-2]
         elif self.word[-2] != "e" and self.word[-1] == "n":
-            self.lemma = self.word[:-1]        
+            self.lemma = self.word[:-1]
+    @classmethod
+    def from_list(cls, list_entry):
+        return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4])
     def conjugation(self, person, number):
         for affix in linguistics.detached_affixes:
             if self.lemma[:len(affix)] == affix:
@@ -176,14 +182,11 @@ class verb:
         return output
 
 from vocabulary import nouns, verbs
-list_of_nouns_as_dicts = nouns.list_of_nouns
-list_of_verbs_as_dicts = verbs.list_of_verbs
-list_of_nouns = list()
-for n in list_of_nouns_as_dicts:
-    list_of_nouns.append(noun(n["word"], n["strong_or_weak"], n["genus"], n["ability_to_act"]))
-list_of_verbs = list()
-for v in list_of_verbs_as_dicts:
-    list_of_verbs.append(verb(v["word"], v["strong_or_weak"], v["valency"], v["object_case"], v["θrolls"]))
+list_of_nouns = [noun.from_list(x) for x in nouns.list_of_nouns]
+#list_of_verbs = [verb.from_list(x) for x in verbs.list_of_verbs]
+
+print(verbs.list_of_verbs)
     
-print(list_of_verbs)
+
+        
 
