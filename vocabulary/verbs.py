@@ -12,7 +12,7 @@ list_of_verbs = [
 ["lauern", "weak", 1, 0, ["agent"]],
 ["spielen", "weak", 1, 0, ["agent"]],
 ["schlafen", "strong", 1, 0, ["agent"]],
-["vergeben", "strong", 2, "dative",  ["agent", "patient"]],
+["vergeben", "strong", 2, "dative",  ["agent", "experiencer"]],
 ["sprechen", "strong", 1, 0, ["agent"]],
 ["begraben", "strong", 2, "accusative", ["agent", "patient"]],
 ["verstecken", "weak", 2, "accusative", ["agent", "patient"]],

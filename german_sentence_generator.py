@@ -5,20 +5,18 @@ Created on Thu Jan 27 23:39:18 2022
 @author: jonny
 """
 import random
-import vocabulary
+from vocabulary import nouns, verbs, adjectives, person_names, prepositions
 import part_of_speech
 import linguistics
 from utils import surface
 
-list_of_nouns = [part_of_speech.noun.from_list(x) for x in vocabulary.nouns.list_of_nouns]
-list_of_verbs = [part_of_speech.verb.from_list(x) for x in vocabulary.verbs.list_of_verbs]
-list_of_adjectives = [part_of_speech.adjective.from_string(x) for x in vocabulary.adjectives.list_of_adjectives]
-list_of_person_names = [part_of_speech.person_name.from_list(x) for x in vocabulary.person_names.list_of_person_names]
-list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in vocabulary.prepositions.list_of_prepositions]
-
-
-
-def generate_sentence():
+def generate_sentence():   
+    list_of_nouns = [part_of_speech.noun.from_list(x) for x in nouns.list_of_nouns]
+    list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.list_of_verbs]
+    list_of_adjectives = [part_of_speech.adjective.from_string(x) for x in adjectives.list_of_adjectives]
+    list_of_person_names = [part_of_speech.person_name.from_list(x) for x in person_names.list_of_person_names]
+    list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.list_of_prepositions]
+    
     #choose predicate
     predicate = list_of_verbs[random.randrange(len(list_of_verbs))]
     detached_affix_if_required = ""

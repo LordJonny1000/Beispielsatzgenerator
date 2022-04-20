@@ -2,7 +2,7 @@ import part_of_speech
 
 def surface(instance, subject=None, case="nominative"):
     if type(instance) == part_of_speech.noun:
-        return instance.declension(instance.number, case) + " "
+        return instance.declension(case) + " "
     elif type(instance) == part_of_speech.verb:
         return instance.conjugation(subject.person, subject.number) + " "
     elif type(instance) == part_of_speech.article:

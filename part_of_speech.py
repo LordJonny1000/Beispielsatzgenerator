@@ -12,8 +12,10 @@ class noun:
     @classmethod
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
-    def declension(self, number, case="nominative"):
-        if number == "plural":  
+    def declension(self, case="nominative"):
+        if self.word in linguistics.no_plural_form:
+            self.number = "singular"
+        if self.number == "plural":  
             if self.strong_or_weak == "strong":
                 last_possible_umlaut = ""
                 counter = 0
@@ -84,7 +86,7 @@ class noun:
                 output = self.lemma + "e"
             else: 
                 output = self.lemma + "s"
-        elif number == "singular":
+        elif self.number == "singular":
             output = self.lemma
         # N for "gefällt den GeneräleN", "empfiehlt dem HaseN"
         #errors: Meister Proper riecht den Hase., sieht der Handgranaten unter der Disco zu.
@@ -144,6 +146,8 @@ class verb:
                         self.lemma = self.lemma.replace("ih", "ieh") 
                     elif self.word == "lesen":
                         self.lemma = self.lemma.replace("i", "ie")
+        if person == "1st" and self.word == "zerstückeln":#<---adjust certain words
+            self.lemma = self.lemma[:-2] + self.lemma[-1]
         if person == "1st" and number == "singular":
             output = self.lemma + "e"
         elif person == "2nd" and number == "singular":
