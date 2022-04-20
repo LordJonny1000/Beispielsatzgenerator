@@ -1,1 +1,1 @@
-# Beispielsatzgenerator
+# german_sentence_generator
