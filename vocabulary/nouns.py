@@ -31,7 +31,7 @@ list_of_nouns = [
 ["Abendessen", "weak", "neutral", False],
 ["Krokodil", "weak", "neutral", True],
 ["Hochzeitskleid", "weak", "neutral", False],
-["Kartoffelschäler", "weak", "masuline", False],
+["Kartoffelschäler", "weak", "masculine", False],
 ["Leiche", "weak", "feminine", False],
 ["Triebwerk", "weak", "neutral", False],
 ["Sauerkraut", "weak", "neutral", False],
