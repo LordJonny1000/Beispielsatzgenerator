@@ -1,16 +1,18 @@
 import part_of_speech
 
-def surface(instance, subject=None, case="nominative"):
+def surface(instance, subject=None, case="nominative", number="singular", article_type = "determinative"):
     if type(instance) == part_of_speech.noun:
         return instance.declension(case) + " "
+    if type(instance) == part_of_speech.adjective:
+        return instance.declension(number, article_type, case)
     elif type(instance) == part_of_speech.verb:
-        return instance.conjugation(subject.person, subject.number) + " "
+        return instance.conjugation(subject.person, subject.number)
     elif type(instance) == part_of_speech.article:
-        return instance.word + " "
+        return instance.word
     elif type(instance) == part_of_speech.pronoun:
         return instance.word + " "
     elif type(instance) == part_of_speech.person_name:
-        return instance.word + " "
+        return instance.word  + " "
     elif type(instance) == str:
         return instance
     

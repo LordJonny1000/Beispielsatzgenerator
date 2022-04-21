@@ -5,7 +5,7 @@ Created on Thu Jan 27 23:39:18 2022
 @author: jonny
 """
 import random
-from vocabulary import nouns, verbs, adjectives, person_names, prepositions
+from vocabulary import nouns, verbs, adjectives, person_names, prepositions, locations
 import part_of_speech
 import linguistics
 from utils import surface
@@ -16,8 +16,9 @@ def generate_sentence():
     list_of_adjectives = [part_of_speech.adjective.from_string(x) for x in adjectives.list_of_adjectives]
     list_of_person_names = [part_of_speech.person_name.from_list(x) for x in person_names.list_of_person_names]
     list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.list_of_prepositions]
+    list_of_locations = [part_of_speech.noun.from_list(x) for x in locations.list_of_locations]
     
-    #choose predicate
+    #generate predicate
     predicate = list_of_verbs[random.randrange(len(list_of_verbs))]
     detached_affix_if_required = ""
     for affix in linguistics.detached_affixes:
@@ -25,7 +26,7 @@ def generate_sentence():
             detached_affix_if_required = affix
             break
     
-    #choose subject
+    #generate subject
     subject = [list_of_person_names[random.randrange(len(list_of_person_names))], part_of_speech.pronoun("personal", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(2)], None), [x for x in list_of_nouns if x.ability_to_act][random.randrange(len([x for x in list_of_nouns if x.ability_to_act]))]][random.randrange(3)]
     subject_article_if_required = ""
     if predicate.valency == 0:
@@ -34,7 +35,7 @@ def generate_sentence():
         if subject.number == "singular":
             subject_article_if_required = part_of_speech.article(linguistics.article_types[random.randrange(2)], subject.number, subject.genus)
     
-    #choose object1 if 
+    #generate object1 if valency >= 2
     object1 = ""
     object1_article_if_required = ""
     if predicate.valency == 2:
@@ -45,11 +46,22 @@ def generate_sentence():
            object1 = [list_of_person_names[random.randrange(len(list_of_person_names))], [x for x in list_of_nouns if x.ability_to_act][0], part_of_speech.pronoun("reflexive", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(3)], predicate.object_case)][random.randrange(3)]
         if type(object1) == part_of_speech.noun and object1.number == "singular":
                 object1_article_if_required = part_of_speech.article(linguistics.article_types[random.randrange(2)], "singular", object1.genus, predicate.object_case)
+                
+    #generate prepositional_phrase
+    preposition = [x for x in list_of_prepositions if predicate.movement in x.possible_movement_modes][random.randrange(len([x.word for x in list_of_prepositions if predicate.movement in x.possible_movement_modes]))]
+    location = list_of_locations[random.randrange(len(list_of_locations))]
+    location_article = part_of_speech.article("definite", "singular", location.genus, preposition.case[preposition.possible_movement_modes.index(predicate.movement)])
+    #generate location_adjective
+    location_adjective = list_of_adjectives[random.randrange(len(list_of_adjectives))].declension("definite", "singular", preposition.case[preposition.possible_movement_modes.index(predicate.movement)])
+    prepositional_phrase = preposition.word + " " + location_article.word + location_adjective + " " + surface(location)
+    
+    
+
 
     
     
     #surface transformation
-    output = surface(subject_article_if_required).capitalize() + surface(subject) + surface(predicate, subject) + surface(object1_article_if_required, predicate.object_case) + surface(object1, case=predicate.object_case) + detached_affix_if_required
+    output = surface(subject_article_if_required).capitalize() + surface(subject) + surface(predicate, subject) + surface(object1_article_if_required, predicate.object_case) + surface(object1, case=predicate.object_case) + prepositional_phrase + detached_affix_if_required
        
     
     #finish   

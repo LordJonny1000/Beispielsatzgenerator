@@ -1,5 +1,6 @@
 import random
 import linguistics
+from vocabulary import locations
 class noun:
     def __init__(self, word, strong_or_weak, genus, ability_to_act):
         self.word = word
@@ -9,6 +10,8 @@ class noun:
         self.ability_to_act = ability_to_act
         self.person = "3rd"
         self.number = linguistics.numbers[random.randrange(2)]
+        if self.word in [x[0] for x in locations.list_of_locations]:#only unse singular for locations
+            self.number = "singular"
     @classmethod
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
@@ -89,7 +92,6 @@ class noun:
         elif self.number == "singular":
             output = self.lemma
         # N for "gefällt den GeneräleN", "empfiehlt dem HaseN"
-        #errors: Meister Proper riecht den Hase., sieht der Handgranaten unter der Disco zu.
         if case == "dative" and output[-1] == "e" and output[-2] != "t" :
             output = output + "n"
         elif case == "dative" and output[-1] == "e" and output[-2] != "t" :
@@ -97,19 +99,20 @@ class noun:
         return output
 
 class verb:
-    def __init__(self, word, strong_or_weak, valency, object_case, θrolls):
+    def __init__(self, word, strong_or_weak, valency, object_case, θrolls, movement):
         self.word = word
         self.strong_or_weak = strong_or_weak
         self.valency = valency
         self.object_case = object_case
         self.θrolls = θrolls
+        self.movement = movement
         if self.word[-2] == "e" and self.word[-1] == "n":
             self.lemma = self.word[:-2]
         elif self.word[-2] != "e" and self.word[-1] == "n":
             self.lemma = self.word[:-1]
     @classmethod
     def from_list(cls, list_entry):
-        return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4])
+        return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5])
     def conjugation(self, person, number):
         for affix in linguistics.detached_affixes:
             if self.lemma[:len(affix)] == affix:
@@ -175,7 +178,7 @@ class verb:
         #exception for sehen
         if person == "3rd" and number == "singular" and self.word in("sehen", "zusehen"):
             output = "sieht"
-        return output
+        return output + " "
 
 class adjective:
     def __init__(self, word):
@@ -183,7 +186,7 @@ class adjective:
     @classmethod
     def from_string(cls, string):
         return cls(string)
-    def declension(self, number, article_type, case="nominative",):
+    def declension(self, article_type, number, case="nominative",):
         output = self.word + "e"
         if case=="nominative" and number =="singular" :
             output = output
@@ -191,6 +194,7 @@ class adjective:
                 output = output + "r"
         else:
             output = output + "n"
+        return output
             
 class person_name:
 
@@ -203,17 +207,19 @@ class person_name:
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1])
     def declension(self, number, case="nominative"):
-        return self.word
+        return self.word + " "
 
 
     
 class preposition:
-        def __init__(self, word, preposition_type):
+        def __init__(self, word, preposition_type, possible_movement_modes, case):
             self.word = word
             self.preposition_type = preposition_type
+            self.possible_movement_modes = possible_movement_modes
+            self.case = case
         @classmethod
         def from_list(cls, list_entry):
-            return cls(list_entry[0], list_entry[1])
+            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
         
 class pronoun:
         def __init__(self, pronoun_type, person, number, genus, case):
@@ -310,84 +316,84 @@ class article:
             if article_type == "definite":
                 if number == "singular":
                     if genus == "masculine":
-                        output = "der"
+                        output = "der "
                     elif genus == "feminine":
-                        output = "die"
+                        output = "die "
                     elif genus == "neutral":
-                        output = "das"
+                        output = "das "
                 elif number == "plural":
-                    output = "die"
+                    output = "die "
             elif article_type == "indefinite":
                 if number == "singular":
                     if genus == "masculine":
-                        output = "ein"
+                        output = "ein "
                     elif genus == "feminine":
-                        output = "eine"
+                        output = "eine "
                     elif genus == "neutral":
-                        output = "ein"
+                        output = "ein "
                 if number == "plural":
                     output = ""
         elif case == "genitive":
             if article_type == "definite":
                 if number == "singular":
                     if genus == "masculine":
-                        output = "des"
+                        output = "des "
                     elif genus == "feminine":
-                        output = "der"
+                        output = "der "
                     elif genus == "neutral":
-                        output = "des"
+                        output = "des "
                 elif number == "plural":
-                    output = "der"
+                    output = "der "
             elif article_type == "indefinite":
                 if number == "singular":
                     if genus == "masculine":
-                        output = "eines"
+                        output = "eines "
                     elif genus == "feminine":
-                        output = "einer"
+                        output = "einer "
                     elif genus == "neutral":
-                        output = "eines"
+                        output = "eines "
                 if number == "plural":
                     output = ""
         elif case == "dative":
             if article_type == "definite":
                 if number == "singular":
                     if genus == "masculine":
-                        output = "dem"
+                        output = "dem "
                     elif genus == "feminine":
-                        output = "der"
+                        output = "der "
                     elif genus == "neutral":
-                        output = "dem"
+                        output = "dem "
                 elif number == "plural":
-                    output = "den"
+                    output = "den "
             elif article_type == "indefinite":
                 if number == "singular":
                     if genus == "masculine":
-                        output = "einem"
+                        output = "einem "
                     elif genus == "feminine":
-                        output = "einer"
+                        output = "einer "
                     elif genus == "neutral":
-                        output = "einem"
+                        output = "einem "
                 if number == "plural":
                     output = ""
         elif case == "accusative":
             if article_type == "definite":
                 if number == "singular":
                     if genus == "masculine":
-                        output = "den"
+                        output = "den "
                     elif genus == "feminine":
-                        output = "die"
+                        output = "die "
                     elif genus == "neutral":
-                        output = "das"
+                        output = "das "
                 elif number == "plural":
-                    output = "die"
+                    output = "die "
             elif article_type == "indefinite":
                 if number == "singular":
                     if genus == "masculine":
-                        output = "einen"
+                        output = "einen "
                     elif genus == "feminine":
-                        output = "eine"
+                        output = "eine "
                     elif genus == "neutral":
-                        output = "ein"
+                        output = "ein "
                 if number == "plural":
                     output = ""
         else:
