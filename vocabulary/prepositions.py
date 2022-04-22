@@ -4,5 +4,5 @@ list_of_prepositions = [
 ["unter", "local", ["stay", "move"], ["dative", "accusative"]],
 ["neben", "local", ["stay", "move"], ["dative", "accusative"]],
 ["bei", "local", ["stay"], ["dative"]],
-["um", "local", ["move"], ["dative"]],
+["um", "local", ["move"], ["accusative"]],
 ]

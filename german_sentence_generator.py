@@ -10,13 +10,15 @@ import part_of_speech
 import linguistics
 from utils import surface
 
+list_of_nouns = [part_of_speech.noun.from_list(x) for x in nouns.list_of_nouns]
+list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.list_of_verbs]
+list_of_adjectives = [part_of_speech.adjective.from_string(x) for x in adjectives.list_of_adjectives]
+list_of_person_names = [part_of_speech.person_name.from_list(x) for x in person_names.list_of_person_names]
+list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.list_of_prepositions]
+list_of_locations = [part_of_speech.noun.from_list(x) for x in locations.list_of_locations]
+
 def generate_sentence():   
-    list_of_nouns = [part_of_speech.noun.from_list(x) for x in nouns.list_of_nouns]
-    list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.list_of_verbs]
-    list_of_adjectives = [part_of_speech.adjective.from_string(x) for x in adjectives.list_of_adjectives]
-    list_of_person_names = [part_of_speech.person_name.from_list(x) for x in person_names.list_of_person_names]
-    list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.list_of_prepositions]
-    list_of_locations = [part_of_speech.noun.from_list(x) for x in locations.list_of_locations]
+
     
     #generate predicate
     predicate = list_of_verbs[random.randrange(len(list_of_verbs))]
@@ -28,12 +30,22 @@ def generate_sentence():
     
     #generate subject
     subject = [list_of_person_names[random.randrange(len(list_of_person_names))], part_of_speech.pronoun("personal", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(2)], None), [x for x in list_of_nouns if x.ability_to_act][random.randrange(len([x for x in list_of_nouns if x.ability_to_act]))]][random.randrange(3)]
-    subject_article_if_required = ""
+    #subject = [x for x in list_of_nouns if x.ability_to_act][random.randrange(len([x for x in list_of_nouns if x.ability_to_act]))]
+    subject_article_if_required = part_of_speech.article("indefinite", "plural", "neutral")
     if predicate.valency == 0:
         subject = part_of_speech.person_name("Es", "neutral")
     if type(subject) == part_of_speech.noun:
         if subject.number == "singular":
             subject_article_if_required = part_of_speech.article(linguistics.article_types[random.randrange(2)], subject.number, subject.genus)
+  
+    #generate subject adjective
+    subject_adjective = ""
+    if predicate.valency != 0:
+        if type(subject) != part_of_speech.pronoun:
+            subject_adjective = list_of_adjectives[random.randrange(len(list_of_adjectives))]
+            if type(subject) == part_of_speech.person_name:
+                subject_article_if_required = part_of_speech.article("definite", "singular", subject.genus)
+
     
     #generate object1 if valency >= 2
     object1 = ""
@@ -52,24 +64,23 @@ def generate_sentence():
     location = list_of_locations[random.randrange(len(list_of_locations))]
     location_article = part_of_speech.article("definite", "singular", location.genus, preposition.case[preposition.possible_movement_modes.index(predicate.movement)])
     #generate location_adjective
-    location_adjective = list_of_adjectives[random.randrange(len(list_of_adjectives))].declension("definite", "singular", preposition.case[preposition.possible_movement_modes.index(predicate.movement)])
-    prepositional_phrase = preposition.word + " " + location_article.word + location_adjective + " " + surface(location)
+    location_adjective = list_of_adjectives[random.randrange(len(list_of_adjectives))].declension("definite", "singular", location.genus, preposition.case[preposition.possible_movement_modes.index(predicate.movement)])
+
+    prepositional_phrase = preposition.word + " " + location_article.word + location_adjective + surface(location)
     
     
 
 
-    
-    
     #surface transformation
-    output = surface(subject_article_if_required).capitalize() + surface(subject) + surface(predicate, subject) + surface(object1_article_if_required, predicate.object_case) + surface(object1, case=predicate.object_case) + prepositional_phrase + detached_affix_if_required
-       
+    output = surface(subject_article_if_required).capitalize() + surface(subject_adjective, None, subject_article_if_required.article_type, subject.number, subject.genus, "nominative") + surface(subject) + surface(predicate, subject) + surface(object1_article_if_required, predicate.object_case) + surface(object1, case=predicate.object_case) + prepositional_phrase + detached_affix_if_required
+ 
     
     #finish   
     if output[-1] == " ":
         output = output[:-1]
     output = output[0].upper() + output[1:] + "."
     return output
-
+    #return part_of_speech.adjective.from_string("").declension("definite", "singular", "feminine")
 print(generate_sentence())
 
 
