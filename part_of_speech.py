@@ -1,6 +1,6 @@
 import random
 import linguistics
-from vocabulary import locations
+from vocabulary.semantic_classes import locations
 class noun:
     def __init__(self, word, strong_or_weak, genus, ability_to_act):
         self.word = word
@@ -10,14 +10,15 @@ class noun:
         self.ability_to_act = ability_to_act
         self.person = "3rd"
         self.number = linguistics.numbers[random.randrange(2)]
+        if self.word in linguistics.no_plural_form:
+            self.number = "singular"
         if self.word in [x[0] for x in locations.list_of_locations]:#only unse singular for locations
             self.number = "singular"
     @classmethod
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
     def declension(self, case="nominative"):
-        if self.word in linguistics.no_plural_form:
-            self.number = "singular"
+
         if self.number == "plural":  
             if self.strong_or_weak == "strong":
                 last_possible_umlaut = ""
@@ -93,9 +94,9 @@ class noun:
             output = self.lemma
         # N for "gefällt den GeneräleN", "empfiehlt dem HaseN"
         if case == "dative" and output[-1] == "e" and output[-2] != "t" :
-            output = output + "n"
-        elif case == "dative" and output[-1] == "e" and output[-2] != "t" :
-            output = output + "n"
+            output = output + "n"#in diesem Bereich verwirrung wegen "Es gefällt meiner Kanonen"
+        if case == "dative" and self.number == "plural" and output[-1] != "n" and self.genus != "feminine":
+            output += "n"
         return output
 
 class verb:
@@ -106,9 +107,9 @@ class verb:
         self.object_case = object_case
         self.θrolls = θrolls
         self.movement = movement
-        if self.word[-2] == "e" and self.word[-1] == "n":
+        if self.word[-2:] == "en":
             self.lemma = self.word[:-2]
-        elif self.word[-2] != "e" and self.word[-1] == "n":
+        else:
             self.lemma = self.word[:-1]
     @classmethod
     def from_list(cls, list_entry):
@@ -149,10 +150,10 @@ class verb:
                         self.lemma = self.lemma.replace("ih", "ieh") 
                     elif self.word == "lesen":
                         self.lemma = self.lemma.replace("i", "ie")
-        if person == "1st" and self.word in("zerstückeln", "wandern"):#<---adjust certain words
-            self.lemma = self.lemma[:-2] + self.lemma[-1]
         if person == "1st" and number == "singular":
             output = self.lemma + "e"
+            if self.word[-3:] == "eln":
+                output = output[:-3] + output[-2:]
         elif person == "2nd" and number == "singular":
             if self.lemma[-1] == "t":
                 output = self.lemma + "est"
@@ -167,6 +168,9 @@ class verb:
                 output = self.lemma + "t"
         elif person == "1st" and number == "plural":
             output = self.lemma + "en"
+            if self.word[-3:] in ("ern", "eln"):#<---adjust certain words
+                output = output[:-2] + output[-1]
+
         elif person == "2nd" and number == "plural":
             output = self.lemma + "t"
         elif person == "3rd" and number == "plural":
@@ -213,7 +217,7 @@ class adjective:
                     if genus == "masculine":
                         return self.word + "en "
                     elif genus in("feminine", "neutral"):
-                        return self.word + "en "
+                        return self.word + "e "
                 elif article_type == "indefinite":
                     if genus == "masculine":
                         return self.word + "en "
@@ -236,7 +240,7 @@ class adjective:
         if self.word == "":
             return ""
             
-class person_name:
+class proper_name:
 
     def __init__(self, word, genus):
         self.word = word
@@ -253,14 +257,123 @@ class person_name:
     
 class preposition:
         def __init__(self, word, preposition_type, possible_movement_modes, case):
-            self.word = word
+            self.word = word + " "
             self.preposition_type = preposition_type
             self.possible_movement_modes = possible_movement_modes
             self.case = case
         @classmethod
         def from_list(cls, list_entry):
             return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
-        
+
+class pronoun:
+        def __init__(self, pronoun_type, person, number, genus, case, noun_number = "singular", noun_genus = "neutral"):
+            self.pronoun_type = pronoun_type
+            self.person = person
+            self.number = number
+            self.genus = genus
+            self.case = case
+            self.noun_number = noun_number
+            self.noun_genus = noun_genus
+            if self.pronoun_type == "personal":
+                if self.number == "singular":
+                    if self.person == "1st":
+                        self.word =  "ich"
+                    elif self.person == "2nd":
+                        self.word =  "du"
+                    elif self.person == "3rd":
+                        if self.genus == "masculine":
+                            self.word =  "er"
+                        elif self.genus == "feminine":
+                            self.word =  "sie"
+                        elif self.genus == "neutral":
+                            self.word =  "es"
+                elif self.number == "plural":
+                    if self.person == "1st":
+                        self.word =  "wir"
+                    elif self.person == "2nd":
+                        self.word =  "ihr"
+                    elif self.person == "3rd":
+                        self.word =  "sie"
+            elif self.pronoun_type == "possesive":
+                if self.number == "singular":
+                    if self.person == "1st":
+                        self.word =  "mein"
+                    elif self.person == "2nd":
+                        self.word =  "dein"
+                    elif self.person == "3rd":
+                        if self.genus in("neutral", "masculine"):
+                            self.word =  "sein"
+                        elif self.genus == "feminine":
+                            self.word =  "ihr"
+                elif self.number == "plural":
+                    if self.person == "1st":
+                        self.word =  "unser"
+                    elif self.person == "2nd":
+                        self.word =  "euer"
+                    elif self.person == "3rd":
+                        self.word =  "ihr"
+                if self.person == "2nd" and self.number == "plural" and self.case == "nominative" and self.noun_genus == "feminine":
+                    self.word = "eur"
+                if self.noun_genus == "feminine" and self.case == "nominative":
+                    self.word = self.word + "e"
+                if self.case == "dative":
+                    if self.person == "2nd" and self.number == "plural":
+                        self.word = "eur"
+                    if self.noun_number == "singular":
+                        if self.noun_genus in("masculine", "neutral"):
+                            self.word += "em"
+                        elif self.noun_genus == "feminine":
+                            self.word += "er"
+                    elif self.noun_number == "plural":
+                        self.word += "en"
+            #Possesiv-Akkusativ fehlt noch!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                
+            elif self.pronoun_type == "reflexive":
+                if self.case == "dative":
+                    if self.number == "singular":
+                        if self.person == "1st":
+                            self.word =  "mir"
+                        elif self.person == "2nd":
+                            self.word =  "dir"
+                        elif self.person == "3rd":
+                            if self.genus in("neutral", "masculine"):
+                                self.word =  "ihm"
+                            elif self.genus == "feminine":
+                                self.word =  "ihr"
+                    elif self.number == "plural":
+                        if self.person == "1st":
+                            self.word =  "uns"
+                        elif self.person == "2nd":
+                            self.word =  "euch"
+                        elif self.person == "3rd":
+                            self.word =  "ihnen"
+                elif self.case == "accusative":
+                    if self.number == "singular":
+                        if self.person == "1st":
+                            self.word =  "mich"
+                        elif self.person == "2nd":
+                            self.word =  "dich"
+                        elif self.person == "3rd":
+                            if self.genus == "masculine":
+                                self.word =  "ihn"
+                            elif self.genus == "feminine":
+                                self.word =  "sie"
+                            elif self.genus == "neutral":
+                                self.word =  "es"
+                    elif self.number == "plural":
+                        if self.person == "1st":
+                            self.word =  "uns"
+                        elif self.person == "2nd":
+                            self.word =  "euch"
+                        elif self.person == "3rd":
+                            self.word =  "sie"
+from vocabulary.general import nouns
+list_of_nouns = [noun.from_list(x) for x in nouns.list_of_nouns]
+object1 = list_of_nouns[random.randrange(len(list_of_nouns))]
+print(object1.number, object1.genus)
+print("Es gefällt " + pronoun("possesive", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(3)], "dative", object1.number, object1.genus).word + " " + object1.declension("dative"))
+
+"""       
 class pronoun:
         def __init__(self, pronoun_type, person, number, genus, case):
             self.pronoun_type = pronoun_type
@@ -345,7 +458,7 @@ class pronoun:
                             self.word =  "euch"
                         elif self.person == "3rd":
                             self.word =  "sie"
-
+"""
 class article:
     def __init__(self, article_type, number, genus, case="nominative"):
         self.article_type = article_type
@@ -440,7 +553,4 @@ class article:
             print(number, genus, article_type, case)
             output = "Achtung, der Artikel konnte nicht gebildet werden!"  
         self.word = output
-
-
-     
 

@@ -11,7 +11,7 @@ def surface(instance, subject=None, article_type = "determinative", number="sing
         return instance.word
     elif type(instance) == part_of_speech.pronoun:
         return instance.word + " "
-    elif type(instance) == part_of_speech.person_name:
+    elif type(instance) == part_of_speech.proper_name:
         return instance.word  + " "
     elif type(instance) == str:
         return instance
