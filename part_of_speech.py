@@ -92,11 +92,16 @@ class noun:
                 output = self.lemma + "s"
         elif self.number == "singular":
             output = self.lemma
-        # N for "gefällt den GeneräleN", "empfiehlt dem HaseN"
-        if case == "dative" and output[-1] == "e" and output[-2] != "t" :
-            output = output + "n"#in diesem Bereich verwirrung wegen "Es gefällt meiner Kanonen"
-        if case == "dative" and self.number == "plural" and output[-1] != "n" and self.genus != "feminine":
+        if case == "dative" and output[-1] == "e" and self.number == "plural":
+            output = output + "n"
+        if case == "dative" and output[-3:] == "ent" and self.number == "plural":
+            output = output + "en"
+        if case == "dative" and self.word in(linguistics.irregular_dative[0]):
             output += "n"
+        if case == "dative" and self.number == "plural" and self.word in(linguistics.irregular_dative[1]):
+            output += "n"
+        if case == "dative" and self.word in(linguistics.irregular_dative[2]):
+            output += "en"
         return output
 
 class verb:
@@ -326,8 +331,16 @@ class pronoun:
                             self.word += "er"
                     elif self.noun_number == "plural":
                         self.word += "en"
-            #Possesiv-Akkusativ fehlt noch!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                
+                if self.case == "accusative":
+                    if self.person == "2nd" and self.number == "plural":
+                        self.word = "eur"
+                    if self.noun_number == "singular":
+                        if self.noun_genus == "feminine":
+                            self.word += "e"
+                        elif self.noun_genus == "masculine":
+                            self.word += "en"
+                    elif self.noun_number == "plural":
+                        self.word += "e"
             elif self.pronoun_type == "reflexive":
                 if self.case == "dative":
                     if self.number == "singular":
@@ -367,98 +380,7 @@ class pronoun:
                             self.word =  "euch"
                         elif self.person == "3rd":
                             self.word =  "sie"
-from vocabulary.general import nouns
-list_of_nouns = [noun.from_list(x) for x in nouns.list_of_nouns]
-object1 = list_of_nouns[random.randrange(len(list_of_nouns))]
-print(object1.number, object1.genus)
-print("Es gefällt " + pronoun("possesive", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(3)], "dative", object1.number, object1.genus).word + " " + object1.declension("dative"))
 
-"""       
-class pronoun:
-        def __init__(self, pronoun_type, person, number, genus, case):
-            self.pronoun_type = pronoun_type
-            self.person = person
-            self.number = number
-            self.genus = genus
-            self.case = case
-            if self.pronoun_type == "personal":
-                if self.number == "singular":
-                    if self.person == "1st":
-                        self.word =  "ich"
-                    elif self.person == "2nd":
-                        self.word =  "du"
-                    elif self.person == "3rd":
-                        if self.genus == "masculine":
-                            self.word =  "er"
-                        elif self.genus == "feminine":
-                            self.word =  "sie"
-                        elif self.genus == "neutral":
-                            self.word =  "es"
-                elif self.number == "plural":
-                    if self.person == "1st":
-                        self.word =  "wir"
-                    elif self.person == "2nd":
-                        self.word =  "ihr"
-                    elif self.person == "3rd":
-                        self.word =  "sie"
-            elif self.pronoun_type == "possesive":
-                if self.number == "singular":
-                    if self.person == "1st":
-                        self.word =  "mein"
-                    elif self.person == "2nd":
-                        self.word =  "dein"
-                    elif self.person == "3rd":
-                        if self.genus in("neutral", "masculine"):
-                            self.word =  "sein"
-                        elif self.genus == "feminine":
-                            self.word =  "ihr"
-                elif self.number == "plural":
-                    if self.person == "1st":
-                        self.word =  "unser"
-                    elif self.person == "2nd":
-                        self.word =  "euer"
-                    elif self.person == "3rd":
-                        self.word =  "ihr"
-            elif self.pronoun_type == "reflexive":
-                if self.case == "dative":
-                    if self.number == "singular":
-                        if self.person == "1st":
-                            self.word =  "mir"
-                        elif self.person == "2nd":
-                            self.word =  "dir"
-                        elif self.person == "3rd":
-                            if self.genus in("neutral", "masculine"):
-                                self.word =  "ihm"
-                            elif self.genus == "feminine":
-                                self.word =  "ihr"
-                    elif self.number == "plural":
-                        if self.person == "1st":
-                            self.word =  "uns"
-                        elif self.person == "2nd":
-                            self.word =  "euch"
-                        elif self.person == "3rd":
-                            self.word =  "ihnen"
-                elif self.case == "accusative":
-                    if self.number == "singular":
-                        if self.person == "1st":
-                            self.word =  "mich"
-                        elif self.person == "2nd":
-                            self.word =  "dich"
-                        elif self.person == "3rd":
-                            if self.genus == "masculine":
-                                self.word =  "ihn"
-                            elif self.genus == "feminine":
-                                self.word =  "sie"
-                            elif self.genus == "neutral":
-                                self.word =  "es"
-                    elif self.number == "plural":
-                        if self.person == "1st":
-                            self.word =  "uns"
-                        elif self.person == "2nd":
-                            self.word =  "euch"
-                        elif self.person == "3rd":
-                            self.word =  "sie"
-"""
 class article:
     def __init__(self, article_type, number, genus, case="nominative"):
         self.article_type = article_type
