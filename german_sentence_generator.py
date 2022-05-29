@@ -36,16 +36,13 @@ def generate_sentence():
             break
     
     #generate subject
-    subject = list_of_persons[random.randrange(len(list_of_persons))]
-    subject = [x for x in list_of_nouns if x.ability_to_act][random.randrange(len([x for x in list_of_nouns if x.ability_to_act]))]
-    subject_article_if_required = part_of_speech.article("indefinite", "plural", "neutral")
-
+    subject = [list_of_persons[random.randrange(len(list_of_persons))], part_of_speech.pronoun("personal", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(2)], None), [x for x in list_of_nouns if x.ability_to_act][random.randrange(len([x for x in list_of_nouns if x.ability_to_act]))]][random.randrange(3)]
+    subject_determinative = part_of_speech.article("indefinite", "plural", "neutral")
     if predicate.valency == 0:
         subject = part_of_speech.proper_name("es", "neutral")
     if type(subject) == part_of_speech.noun:
-        if subject.number == "singular":
-            subject_article_if_required = part_of_speech.article(linguistics.article_types[random.randrange(2)], subject.number, subject.genus)
-  
+        subject_determinative = [part_of_speech.article(linguistics.article_types[random.randrange(2)], subject.number, subject.genus), part_of_speech.pronoun("possesive", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], "masculine", "nominative", "singular", "feminine")][0]#<--------!!!!! von 1 auf randrange(2) ändern
+
     #generate subject adjective
     subject_adjective = ""
     if probability_settings.prepositional_phrase():
@@ -53,59 +50,86 @@ def generate_sentence():
             if type(subject) != part_of_speech.pronoun:
                 subject_adjective = list_of_adjectives[random.randrange(len(list_of_adjectives))]
                 if type(subject) == part_of_speech.proper_name:
-                    subject_article_if_required = part_of_speech.article("definite", "singular", subject.genus)
+                    subject_determinative = part_of_speech.article("definite", "singular", subject.genus)
 
     
     #generate object1 if valency >= 2
     object1 = ""
-    object1_article_if_required = ""
-    if predicate.valency == 2:
-        object1_article_if_required = ""
+    object1_determinative = ""
+    if predicate.valency >= 2:
+        object1_determinative = ""
         if predicate.θrolls[1] == "patient":
            object1 = [list_of_persons[random.randrange(len(list_of_persons))], list_of_nouns[random.randrange(len(list_of_nouns))], part_of_speech.pronoun("reflexive", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(3)], predicate.object_case)][random.randrange(3)]
         elif predicate.θrolls[1] == "experiencer":
            object1 = [list_of_persons[random.randrange(len(list_of_persons))], [x for x in list_of_nouns if x.ability_to_act][0], part_of_speech.pronoun("reflexive", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(3)], predicate.object_case)][random.randrange(3)]
         if type(object1) == part_of_speech.noun and object1.number == "singular":
-                object1_article_if_required = part_of_speech.article(linguistics.article_types[random.randrange(2)], "singular", object1.genus, predicate.object_case)
-                
+                object1_determinative = part_of_speech.article(linguistics.article_types[random.randrange(2)], "singular", object1.genus, predicate.object_case)
+                if probability_settings.possesive_pronoun_on_object1():
+                    object1_determinative = part_of_speech.pronoun("possesive", linguistics.persons[random.randrange(3)], linguistics.numbers[random.randrange(2)], object1.genus, predicate.object_case, noun_number = object1.number, noun_genus = object1.genus)
+     
+    #generate object2 if valency >= 3
+    object2 = ""
+    object2_determinative = ""
+    if predicate.valency >= 3:
+        object2_determinative = ""
+        if predicate.θrolls[2] == "patient":
+           object2 = [list_of_persons[random.randrange(len(list_of_persons))], list_of_nouns[random.randrange(len(list_of_nouns))], part_of_speech.pronoun("reflexive", "3rd", linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(3)], "accusative")][random.randrange(3)]
+        elif predicate.θrolls[2] == "experiencer":
+           object2 = [list_of_persons[random.randrange(len(list_of_persons))], [x for x in list_of_nouns if x.ability_to_act][0], part_of_speech.pronoun("reflexive", "3rd", linguistics.numbers[random.randrange(2)], linguistics.genera[random.randrange(3)], predicate.object_case)][random.randrange(3)]
+
+        if type(object2) == part_of_speech.noun and object2.number == "singular":
+                object2_determinative = part_of_speech.article(linguistics.article_types[random.randrange(2)], "singular", object2.genus, "accusative")
+
+
+
+
     #generate prepositional_phrase
-    prepositional_phrase = ""
+    location = part_of_speech.noun("", "", "", "")
+    preposition = part_of_speech.preposition("", "", "", "")
+    location_article = ""
+    location_adjective = part_of_speech.adjective.from_string("")
     if probability_settings.prepositional_phrase():
         preposition = [x for x in list_of_prepositions if predicate.movement in x.possible_movement_modes][random.randrange(len([x.word for x in list_of_prepositions if predicate.movement in x.possible_movement_modes]))]
         location = list_of_locations[random.randrange(len(list_of_locations))]
         location_article = part_of_speech.article("definite", "singular", location.genus, preposition.case[preposition.possible_movement_modes.index(predicate.movement)])
         #generate location_adjective
-        location_adjective = list_of_adjectives[random.randrange(len(list_of_adjectives))]
-        prepositional_phrase = preposition.word + location_article.word + location_adjective.declension("definite", "singular", location.genus, preposition.case[preposition.possible_movement_modes.index(predicate.movement)]) + surface(location)
-    
-    
+        if probability_settings.location_adjective():
+            location_adjective = list_of_adjectives[random.randrange(len(list_of_adjectives))]
 
 
+    
     #surface transformation
     if sentence_mode == "declarative":
-        output = surface(subject_article_if_required) + surface(subject_adjective, None, subject_article_if_required.article_type, subject.number, subject.genus, "nominative") + surface(subject) + surface(predicate, subject) + surface(object1_article_if_required, predicate.object_case) + surface(object1, case=predicate.object_case) + prepositional_phrase + detached_affix_if_required
+        output = surface(subject_determinative) + surface(subject_adjective, subject, subject_determinative.article_type, subject.number, subject.genus, "nominative") + surface(subject) + surface(predicate, subject) + surface(object1_determinative, predicate.object_case) \
+                 + surface(object1, case=predicate.object_case) + surface(object2_determinative, predicate.object_case) + surface(object2, case="accusative") \
+                + surface(preposition) + surface(location_article) + surface(location_adjective, article_type="determinative", number="singular", genus=location.genus, case="dative") + surface(location) + detached_affix_if_required#
+        if object2:
+            if type(object2) == part_of_speech.pronoun:
+                output = surface(subject_determinative) + surface(subject_adjective, subject, subject_determinative.article_type, subject.number, subject.genus, "nominative") \
+                    + surface(subject) + surface(predicate, subject) + surface(object2_determinative, predicate.object_case) + surface(object2, case="accusative") \
+                    + surface(object1_determinative, predicate.object_case) + surface(object1, case=predicate.object_case) + surface(preposition)\
+                    + surface(location_article) + surface(location_adjective, article_type="determinative", number="singular", genus=location.genus, case="dative") + surface(location) + detached_affix_if_required
     elif sentence_mode == "interrogative":
-        output = surface(predicate, subject) + surface(subject_article_if_required) + surface(subject_adjective, None, subject_article_if_required.article_type, subject.number, subject.genus, "nominative") + surface(subject) + surface(object1_article_if_required, predicate.object_case) + surface(object1, case=predicate.object_case) + prepositional_phrase + detached_affix_if_required
-
+        output = surface(predicate, subject) + surface(subject_determinative) + surface(subject_adjective, subject, subject_determinative.article_type, subject.number, subject.genus, "nominative") + surface(subject) + surface(object1_determinative, predicate.object_case) \
+                 + surface(object1, case=predicate.object_case) + surface(object2_determinative, predicate.object_case) + surface(object2, case="accusative") \
+                + surface(preposition) + surface(location_article) + surface(location_adjective, article_type="determinative", number="singular", genus=location.genus, case="dative") + surface(location) + detached_affix_if_required#
+        if object2:
+            if type(object2) == part_of_speech.pronoun:
+                output = surface(predicate, subject) + surface(subject_determinative) + surface(subject_adjective, subject, subject_determinative.article_type, subject.number, subject.genus, "nominative") \
+                    + surface(subject) + surface(object2_determinative, predicate.object_case) + surface(object2, case="accusative") \
+                    + surface(object1_determinative, predicate.object_case) + surface(object1, case=predicate.object_case) + surface(preposition)\
+                    + surface(location_article) + surface(location_adjective, article_type="determinative", number="singular", genus=location.genus, case="dative") + surface(location) + detached_affix_if_required
     
     #finish   
+    if output[0] == " ":
+        output = output[1:]        
     if output[-1] == " ":
         output = output[:-1]
     output = output[0].upper() + output[1:] + closing_punctuation_mark
     return output
-    #return part_of_speech.adjective.from_string("").declension("definite", "singular", "feminine")
+
+
 print(generate_sentence())
-
-
-
-
-
-
-
-
-
-
-
 
 
 
