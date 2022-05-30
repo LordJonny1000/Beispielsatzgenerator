@@ -9,7 +9,8 @@ class noun:
         self.lemma = self.word
         self.ability_to_act = ability_to_act
         self.person = "3rd"
-        self.number = linguistics.numbers[random.randrange(2)]
+        self.number = random.choice(linguistics.numbers)
+        self.case = "nominative"
         if self.word in linguistics.no_plural_form:
             self.number = "singular"
         if self.word in [x[0] for x in locations.list_of_locations]:#only unse singular for locations
@@ -17,7 +18,7 @@ class noun:
     @classmethod
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
-    def declension(self, case="nominative"):
+    def declension(self):
         if self.word == "":
             return ""
         if self.number == "plural":  
@@ -93,15 +94,15 @@ class noun:
                 output = self.lemma + "s"
         elif self.number == "singular":
             output = self.lemma
-        if case == "dative" and output[-1] == "e" and self.number == "plural":
+        if self.case == "dative" and output[-1] == "e" and self.number == "plural":
             output = output + "n"
-        if case == "dative" and output[-3:] == "ent" and self.number == "plural":
+        if self.case == "dative" and output[-3:] == "ent" and self.number == "plural":
             output = output + "en"
-        if case == "dative" and self.word in(linguistics.irregular_dative[0]):
+        if self.case == "dative" and self.word in(linguistics.irregular_dative[0]):
             output += "n"
-        if case == "dative" and self.number == "plural" and self.word in(linguistics.irregular_dative[1]):
+        if self.case == "dative" and self.number == "plural" and self.word in(linguistics.irregular_dative[1]):
             output += "n"
-        if case == "dative" and self.word in(linguistics.irregular_dative[2]):
+        if self.case == "dative" and self.word in(linguistics.irregular_dative[2]):
             output += "en"
         return output
 
@@ -120,7 +121,7 @@ class verb:
     @classmethod
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5])
-    def conjugation(self, person, number):
+    def conjugation(self):
         for affix in linguistics.detached_affixes:
             if self.lemma[:len(affix)] == affix:
                 self.lemma = self.lemma.replace(affix, "", 1)
@@ -129,7 +130,7 @@ class verb:
             index_of_v_vowel = 0
             index_of_last_vowel = 0
 
-            if (person == "3rd" and number == "singular") or (person == "2nd" and number == "singular"):
+            if (self.person == "3rd" and self.number == "singular") or (self.person == "2nd" and self.number == "singular"):
                 for v in linguistics.vowels:
                     try: 
                         index_of_v_vowel = (len(self.lemma) - self.lemma[::-1].index(v) - 1)
@@ -156,30 +157,30 @@ class verb:
                         self.lemma = self.lemma.replace("ih", "ieh") 
                     elif self.word == "lesen":
                         self.lemma = self.lemma.replace("i", "ie")
-        if person == "1st" and number == "singular":
+        if self.person == "1st" and self.number == "singular":
             output = self.lemma + "e"
             if self.word[-3:] == "eln":
                 output = output[:-3] + output[-2:]
-        elif person == "2nd" and number == "singular":
+        elif self.person == "2nd" and self.number == "singular":
             if self.lemma[-1] == "t":
                 output = self.lemma + "est"
             elif self.lemma[-1] == "s":
                 output = self.lemma + "t"
             else:
                 output = self.lemma + "st"
-        elif person == "3rd" and number == "singular":
+        elif self.person == "3rd" and self.number == "singular":
             if self.lemma[-1:] in("n", "t"):
                 output = self.lemma + "et"
             else:
                 output = self.lemma + "t"
-        elif person == "1st" and number == "plural":
+        elif self.person == "1st" and self.number == "plural":
             output = self.lemma + "en"
             if self.word[-3:] in ("ern", "eln"):#<---adjust certain words
                 output = output[:-2] + output[-1]
 
-        elif person == "2nd" and number == "plural":
+        elif self.person == "2nd" and self.number == "plural":
             output = self.lemma + "t"
-        elif person == "3rd" and number == "plural":
+        elif self.person == "3rd" and self.number == "plural":
             if self.lemma[-2:] in("er", "el") and self.lemma != "spiel":
                 output = self.lemma + "n"
             else:
@@ -188,7 +189,7 @@ class verb:
             output = "X"
 
         #exception for sehen
-        if person == "3rd" and number == "singular" and self.word in("sehen", "zusehen"):
+        if self.person == "3rd" and self.number == "singular" and self.word in("sehen", "zusehen"):
             output = "sieht"
         return output
 
@@ -198,49 +199,49 @@ class adjective:
     @classmethod
     def from_string(cls, string):
         return cls(string)
-    def declension(self, article_type, number, genus, case="nominative",):
-        if self.word == "":
+    def declension(self):
+        if self.word == None:
             return ""
-        if case=="nominative":
-            if number == "singular":
-                if article_type == "definite":
+        if self.case=="nominative":
+            if self.number == "singular":
+                if self.article_type == "definite":
                     return self.word + "e"
-                elif article_type == "indefinite":
-                    if genus == "masculine":
+                elif self.article_type == "indefinite":
+                    if self.genus == "masculine":
                         return self.word + "er"
-                    elif genus == "feminine":
+                    elif self.genus == "feminine":
                         return self.word + "e"
-                    elif genus == "neutral":
+                    elif self.genus == "neutral":
                         return self.word + "es"
-            elif number == "plural":
-                if article_type == "definite":
+            elif self.number == "plural":
+                if self.article_type == "definite":
                     return self.word + "en"
-                elif article_type == "indefinite":
+                elif self.article_type == "indefinite":
                     return self.word + "e"
                 
             
             else:            
                 return self.word + "e"
-        elif case=="dative":
+        elif self.case=="dative":
             return self.word + "en"
-        elif case=="accusative":
-            if number =="singular":
-                if article_type == "definite":
-                    if genus == "masculine":
+        elif self.case=="accusative":
+            if self.number =="singular":
+                if self.article_type == "definite":
+                    if self.genus == "masculine":
                         return self.word + "en"
-                    elif genus in("feminine", "neutral"):
+                    elif self.genus in("feminine", "neutral"):
                         return self.word + "e"
-                elif article_type == "indefinite":
-                    if genus == "masculine":
+                elif self.article_type == "indefinite":
+                    if self.genus == "masculine":
                         return self.word + "en"
-                    elif genus == "feminine":
+                    elif self.genus == "feminine":
                         return self.word + "e"
-                    elif genus == "neutral":
+                    elif self.genus == "neutral":
                         return self.word + "es"
-            elif number == "plural":
-                if article_type == "definite":
+            elif self.number == "plural":
+                if self.article_type == "definite":
                     return self.word + "en"
-                elif article_type == "indefinite":
+                elif self.article_type == "indefinite":
                     return self.word + "e"
             return self.word
         else:
@@ -257,7 +258,7 @@ class proper_name:
     @classmethod
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1])
-    def declension(self, number, case="nominative"):
+    def declension(self):
         return self.word
 
 
@@ -478,7 +479,9 @@ class article:
                 if number == "plural":
                     output = ""
         else:
-            print(number, genus, article_type, case)
-            output = "Achtung, der Artikel konnte nicht gebildet werden!"  
-        self.word = output
+            output = "Achtung, der Artikel konnte nicht gebildet werden!"
+        try: 
+            self.word = output
+        except NameError:
+            self.word = ""
 

@@ -1,2 +1,2 @@
-Ich gebe mir er hinter dem pummeligen Keller.
-Er zeigt euch er unter dem niedlichen Nirvana.
+Bei wiederholtem Ausführen von generate_sentence() in einer Schleife wird als surface(predicate, subject) "gifällen", lässt sich behem, indem das Erstellen
+von list_of_verbs in die Funktion verlagert wird.
