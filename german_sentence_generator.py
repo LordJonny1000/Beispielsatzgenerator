@@ -63,11 +63,11 @@ def generate_sentence():
            object1 = cp(random.choice([random.choice(list_of_persons), random.choice(list_of_nouns), part_of_speech.pronoun("reflexive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), predicate.object_case)]))
         elif predicate.θrolls[1] == "experiencer":
            object1 = cp(random.choice([random.choice(list_of_persons), random.choice([x for x in list_of_nouns if x.ability_to_act]), part_of_speech.pronoun("reflexive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), predicate.object_case)]))
-        if type(object1) == part_of_speech.noun and object1.number == "singular":
-        
-                object1_determinative = part_of_speech.article(random.choice(linguistics.article_types), "singular", object1.genus, predicate.object_case)
-                if probability_settings.possesive_pronoun_on_object1():
-                    object1_determinative = part_of_speech.pronoun("possesive", random.choice(linguistics.persons), random.choice(linguistics.numbers), object1.genus, predicate.object_case, noun_number = object1.number, noun_genus = object1.genus)
+        if type(object1) == part_of_speech.noun:
+            object1_determinative = random.choice([part_of_speech.article(random.choice(linguistics.article_types), "singular", object1.genus, predicate.object_case), part_of_speech.pronoun("possesive", random.choice(linguistics.persons), random.choice(linguistics.numbers), object1.genus, predicate.object_case, noun_number = object1.number, noun_genus = object1.genus)])
+            if object1.number == "plural" and type(object1_determinative) == part_of_speech.article:
+                object1_determinative = part_of_speech.article("", None, None)
+            
      
     #generate object2 if valency >= 3
     object2 = part_of_speech.noun("", None, None, None)
@@ -96,26 +96,20 @@ def generate_sentence():
 
     #assign syntactic relations
     subject_determinative.noun_number = subject.number
-    subject_adjective.article_type = subject_determinative.article_type
-    subject_adjective.number = subject.number
-    subject_adjective.genus = subject.genus
+    subject_adjective.article_type, subject_adjective.number, subject_adjective.genus = subject_determinative.article_type, subject.number, subject.genus
     subject_adjective.case = "nominative"
-    predicate.person = subject.person
-    predicate.number = subject.number
+    predicate.person, predicate.number = subject.person, subject.number
     object1_determinative.case = predicate.object_case
-    object1.case = predicate.object_case
-    object2_determinative.case = predicate.object_case
-    object2.case = "accusative"
-    location_adjective.article_type = location_article.article_type
-    location_adjective.number = "singular"
-    location_adjective.genus = location.genus
+    object2_determinative.case, object2.case = predicate.object_case, "accusative"
+    location_adjective.article_type, location_adjective.number, location_adjective.genus = location_article.article_type, "singular", location.genus
     if predicate.movement == "stay":
         location_adjective.case = "dative"
     elif predicate.movement == "move":
         location_adjective.case = "accusative" 
 
     #initialize sentence
-    sentence_list = [subject_determinative, subject_adjective, subject, predicate, object1_determinative, object1, object2_determinative, object2, preposition, location_article, location_adjective, location, detached_affix_if_required]
+    sentence_list = [subject_determinative, subject_adjective, subject, predicate, object1_determinative, object1, \
+                     object2_determinative, object2, preposition, location_article, location_adjective, location, detached_affix_if_required]
     
     #adjust word order:
     if object2:
@@ -140,8 +134,6 @@ def generate_sentence():
 
 
 print(generate_sentence())
-
-
 
 
 

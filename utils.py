@@ -17,41 +17,14 @@ def surface(instance):
         output = instance.word
     elif type(instance) == str:
         return instance
-
     return output
 
-
-def swap(l, token1, token2):
-    i1 = l.index(token1)
-    i2 = l.index(token2)
-    l.remove(token1)
-    l.insert(i2, token1)
-    l.remove(token2)
-    l.insert(i1, token2)
-    return l
+def basic_word_form(instance):
+    if type(instance) == str:
+        return ""
+    else:
+        return instance.word
+    
+    
 
 
-
-#def find
-"""
-if sentence_mode == "declarative":
-    output = surface(subject_determinative) + surface(subject_adjective, subject, subject_determinative.article_type, subject.number, subject.genus, "nominative") + surface(subject) + surface(predicate, subject) + surface(object1_determinative, predicate.object_case) \
-             + surface(object1, case=predicate.object_case) + surface(object2_determinative, predicate.object_case) + surface(object2, case="accusative") \
-            + surface(preposition) + surface(location_article) + surface(location_adjective, article_type="determinative", number="singular", genus=location.genus, case="dative") + surface(location) + detached_affix_if_required#
-    if object2:
-        if type(object2) == part_of_speech.pronoun:
-            output = surface(subject_determinative) + surface(subject_adjective, subject, subject_determinative.article_type, subject.number, subject.genus, "nominative") \
-                + surface(subject) + surface(predicate, subject) + surface(object2_determinative, predicate.object_case) + surface(object2, case="accusative") \
-                + surface(object1_determinative, predicate.object_case) + surface(object1, case=predicate.object_case) + surface(preposition)\
-                + surface(location_article) + surface(location_adjective, article_type="determinative", number="singular", genus=location.genus, case="dative") + surface(location) + detached_affix_if_required
-elif sentence_mode == "interrogative":
-    output = surface(predicate, subject) + surface(subject_determinative) + surface(subject_adjective, subject, subject_determinative.article_type, subject.number, subject.genus, "nominative") + surface(subject) + surface(object1_determinative, predicate.object_case) \
-             + surface(object1, case=predicate.object_case) + surface(object2_determinative, predicate.object_case) + surface(object2, case="accusative") \
-            + surface(preposition) + surface(location_article) + surface(location_adjective, article_type="determinative", number="singular", genus=location.genus, case="dative") + surface(location) + detached_affix_if_required#
-    if object2:
-        if type(object2) == part_of_speech.pronoun:
-            output = surface(predicate, subject) + surface(subject_determinative) + surface(subject_adjective, subject, subject_determinative.article_type, subject.number, subject.genus, "nominative") \
-                + surface(subject) + surface(object2_determinative, predicate.object_case) + surface(object2, case="accusative") \
-                + surface(object1_determinative, predicate.object_case) + surface(object1, case=predicate.object_case) + surface(preposition)\
-                + surface(location_article) + surface(location_adjective, article_type="determinative", number="singular", genus=location.genus, case="dative") + surface(location) + detached_affix_if_required
-"""

@@ -121,6 +121,7 @@ class verb:
     @classmethod
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5])
+    
     def conjugation(self):
         new_lemma = self.lemma
         for affix in linguistics.detached_affixes:
@@ -131,30 +132,24 @@ class verb:
             index_of_v_vowel = 0
             index_of_last_vowel = 0
 
-            if (self.person == "3rd" and self.number == "singular") or (self.person == "2nd" and self.number == "singular"):
+            if self.number == "singular" and self.person != "1st":
                 for v in linguistics.vowels:
                     try: 
-                        index_of_v_vowel = (len(new_lemma) - new_lemma[::-1].index(v) - 1)
+                        index_of_v_vowel = len(new_lemma) - new_lemma[::-1].index(v) - 1
                     except: 
                         pass
                     if index_of_v_vowel > index_of_last_vowel:
                         index_of_last_vowel = index_of_v_vowel
-                if new_lemma[index_of_last_vowel] == "a":
+                if new_lemma[index_of_last_vowel] in ("a", "e"):
                     list_for_transformation = list(new_lemma)
-                    list_for_transformation[index_of_last_vowel] = 'ä'
-                    new_lemma = ''.join(list_for_transformation)
-                if new_lemma[index_of_last_vowel] == "e":
-                    list_for_transformation = list(new_lemma)
-                    list_for_transformation[index_of_last_vowel] = 'i'
-                    new_lemma = ''.join(list_for_transformation)
-                
-                    new_lemma = ''.join(list_for_transformation)   
+                    list_for_transformation[index_of_last_vowel] = ["ä", "i"][["a", "e"].index(new_lemma[index_of_last_vowel])]
+                    new_lemma = ''.join(list_for_transformation)  
                 if self.word in linguistics.conjugation_exceptions:
-                    if self.word == "laufen" or self.word == "saufen":
+                    if self.word in("laufen", "saufen"):
                         list_for_transformation = list(new_lemma)
                         list_for_transformation[self.word.index("a")] = 'ä'
                         new_lemma = ''.join(list_for_transformation) 
-                    if self.word == "stehlen" or self.word == "empfehlen" or self.word == "sehen" or self.word == "geschehen" or self.word == "befehlen":
+                    if self.word in("stehlen", "empfehlen", "sehen", "geschehen", "befehlen"):
                         new_lemma = new_lemma.replace("ih", "ieh") 
                     elif self.word == "lesen":
                         new_lemma = new_lemma.replace("i", "ie")
@@ -186,13 +181,7 @@ class verb:
                 output = new_lemma + "n"
             else:
                 output = new_lemma + "en"
-        else:
-            output = "X"
-
-
-
-        #exception for sehen
-        if self.person == "3rd" and self.number == "singular" and self.word in("sehen", "zusehen"):
+        if self.person == "3rd" and self.number == "singular" and self.word in("sehen", "zusehen"):#<---- exception for sehen
             output = "sieht"
         if self.person == "2nd" and self.number == "singular" and self.word in("sehen", "zusehen"):
             output =  "siehst"
