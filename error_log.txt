@@ -1,2 +1,8 @@
-Bei wiederholtem Ausführen von generate_sentence() in einer Schleife wird als surface(predicate, subject) "gifällen", lässt sich behem, indem das Erstellen
-von list_of_verbs in die Funktion verlagert wird.
+
+
+
+
+minor:
+Gibt der hässliche Käpt'n Blaubär ihm ein Sauerkraut unter der abgefuckten Hölle?
+Macht die hässliche Angela Merkel Angela Merkel bei der Hölle nach?
+Unsere abgefuckten Igel lachen Igel unter der abgefuckten Eckkneipe aus.

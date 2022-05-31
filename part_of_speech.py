@@ -21,6 +21,8 @@ class noun:
     def declension(self):
         if self.word == "":
             return ""
+        if self.number == "singular":
+            output = self.lemma
         if self.number == "plural":  
             if self.strong_or_weak == "strong":
                 last_possible_umlaut = ""
@@ -92,8 +94,6 @@ class noun:
                 output = self.lemma + "e"
             else: 
                 output = self.lemma + "s"
-        elif self.number == "singular":
-            output = self.lemma
         if self.case == "dative" and output[-1] == "e" and self.number == "plural":
             output = output + "n"
         if self.case == "dative" and output[-3:] == "ent" and self.number == "plural":
@@ -122,9 +122,10 @@ class verb:
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5])
     def conjugation(self):
+        new_lemma = self.lemma
         for affix in linguistics.detached_affixes:
-            if self.lemma[:len(affix)] == affix:
-                self.lemma = self.lemma.replace(affix, "", 1)
+            if new_lemma[:len(affix)] == affix:
+                new_lemma = new_lemma.replace(affix, "", 1)
                 break
         if self.strong_or_weak == "strong":
             index_of_v_vowel = 0
@@ -133,65 +134,71 @@ class verb:
             if (self.person == "3rd" and self.number == "singular") or (self.person == "2nd" and self.number == "singular"):
                 for v in linguistics.vowels:
                     try: 
-                        index_of_v_vowel = (len(self.lemma) - self.lemma[::-1].index(v) - 1)
+                        index_of_v_vowel = (len(new_lemma) - new_lemma[::-1].index(v) - 1)
                     except: 
                         pass
                     if index_of_v_vowel > index_of_last_vowel:
                         index_of_last_vowel = index_of_v_vowel
-                if self.lemma[index_of_last_vowel] == "a":
-                    list_for_transformation = list(self.lemma)
+                if new_lemma[index_of_last_vowel] == "a":
+                    list_for_transformation = list(new_lemma)
                     list_for_transformation[index_of_last_vowel] = 'ä'
-                    self.lemma = ''.join(list_for_transformation)
-                if self.lemma[index_of_last_vowel] == "e":
-                    list_for_transformation = list(self.lemma)
+                    new_lemma = ''.join(list_for_transformation)
+                if new_lemma[index_of_last_vowel] == "e":
+                    list_for_transformation = list(new_lemma)
                     list_for_transformation[index_of_last_vowel] = 'i'
-                    self.lemma = ''.join(list_for_transformation)
+                    new_lemma = ''.join(list_for_transformation)
                 
-                    self.lemma = ''.join(list_for_transformation)   
+                    new_lemma = ''.join(list_for_transformation)   
                 if self.word in linguistics.conjugation_exceptions:
                     if self.word == "laufen" or self.word == "saufen":
-                        list_for_transformation = list(self.lemma)
+                        list_for_transformation = list(new_lemma)
                         list_for_transformation[self.word.index("a")] = 'ä'
-                        self.lemma = ''.join(list_for_transformation) 
+                        new_lemma = ''.join(list_for_transformation) 
                     if self.word == "stehlen" or self.word == "empfehlen" or self.word == "sehen" or self.word == "geschehen" or self.word == "befehlen":
-                        self.lemma = self.lemma.replace("ih", "ieh") 
+                        new_lemma = new_lemma.replace("ih", "ieh") 
                     elif self.word == "lesen":
-                        self.lemma = self.lemma.replace("i", "ie")
+                        new_lemma = new_lemma.replace("i", "ie")
         if self.person == "1st" and self.number == "singular":
-            output = self.lemma + "e"
+            output = new_lemma + "e"
             if self.word[-3:] == "eln":
                 output = output[:-3] + output[-2:]
         elif self.person == "2nd" and self.number == "singular":
-            if self.lemma[-1] == "t":
-                output = self.lemma + "est"
-            elif self.lemma[-1] == "s":
-                output = self.lemma + "t"
+            if new_lemma[-1] == "t":
+                output = new_lemma + "est"
+            elif new_lemma[-1] == "s":
+                output = new_lemma + "t"
             else:
-                output = self.lemma + "st"
+                output = new_lemma + "st"
         elif self.person == "3rd" and self.number == "singular":
-            if self.lemma[-1:] in("n", "t"):
-                output = self.lemma + "et"
+            if new_lemma[-1:] in("n", "t"):
+                output = new_lemma + "et"
             else:
-                output = self.lemma + "t"
+                output = new_lemma + "t"
         elif self.person == "1st" and self.number == "plural":
-            output = self.lemma + "en"
+            output = new_lemma + "en"
             if self.word[-3:] in ("ern", "eln"):#<---adjust certain words
                 output = output[:-2] + output[-1]
 
         elif self.person == "2nd" and self.number == "plural":
-            output = self.lemma + "t"
+            output = new_lemma + "t"
         elif self.person == "3rd" and self.number == "plural":
-            if self.lemma[-2:] in("er", "el") and self.lemma != "spiel":
-                output = self.lemma + "n"
+            if new_lemma[-2:] in("er", "el") and new_lemma != "spiel":
+                output = new_lemma + "n"
             else:
-                output = self.lemma + "en"
+                output = new_lemma + "en"
         else:
             output = "X"
+
+
 
         #exception for sehen
         if self.person == "3rd" and self.number == "singular" and self.word in("sehen", "zusehen"):
             output = "sieht"
+        if self.person == "2nd" and self.number == "singular" and self.word in("sehen", "zusehen"):
+            output =  "siehst"
         return output
+
+
 
 class adjective:
     def __init__(self, word):
@@ -200,7 +207,7 @@ class adjective:
     def from_string(cls, string):
         return cls(string)
     def declension(self):
-        if self.word == None:
+        if self.word == "":
             return ""
         if self.case=="nominative":
             if self.number == "singular":
@@ -227,7 +234,9 @@ class adjective:
         elif self.case=="accusative":
             if self.number =="singular":
                 if self.article_type == "definite":
+                    
                     if self.genus == "masculine":
+                        
                         return self.word + "en"
                     elif self.genus in("feminine", "neutral"):
                         return self.word + "e"
@@ -321,11 +330,13 @@ class pronoun:
                         self.word =  "euer"
                     elif self.person == "3rd":
                         self.word =  "ihr"
-                if self.person == "2nd" and self.number == "plural" and self.case == "nominative" and self.noun_genus == "feminine":
-                    self.word = "eur"
-                if self.noun_genus == "feminine" and self.case == "nominative":
-                    self.word = self.word + "e"
-                if self.case == "dative":
+                if self.person == "2nd" and self.number == "plural" and self.case == "nominative":
+                    if self.noun_genus == "feminine" or self.noun_number == "plural":
+                        self.word = "eur"
+                if self.case == "nominative":
+                    if self.noun_genus == "feminine" or self.noun_number == "plural":
+                        self.word = self.word + "e"
+                elif self.case == "dative":
                     if self.person == "2nd" and self.number == "plural":
                         self.word = "eur"
                     if self.noun_number == "singular":
@@ -335,11 +346,11 @@ class pronoun:
                             self.word += "er"
                     elif self.noun_number == "plural":
                         self.word += "en"
-                if self.case == "accusative":
+                elif self.case == "accusative":
                     if self.person == "2nd" and self.number == "plural":
-                        self.word = "eur"
+                        if self.noun_genus in("feminine", "masculine") or self.noun_number == "plural":
+                            self.word = "eur"
                     if self.noun_number == "singular":
-                        
                         if self.noun_genus == "feminine":
                             self.word += "e"
                         elif self.noun_genus == "masculine":

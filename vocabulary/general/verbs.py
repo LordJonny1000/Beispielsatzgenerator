@@ -28,5 +28,5 @@ list_of_verbs = [
 ["austricksen", "weak", 2, "accusative", ["agent", "experiencer"], "stay"],
 ["fliegen", "weak", 1, 0, ["agent"], "move"],
 ["zeigen", "weak", 3, "dative", ["agent", "experiencer", "patient"], "stay"],
-["geben", "strong", 3, "dative", ["agent", "experiencer", "patient"], "stay"],
+["geben", "strong", 3, "dative", ["agent", "experiencer", "patient"], "stay"], #maybe add annotation that no person can be chosen as object2
 ]

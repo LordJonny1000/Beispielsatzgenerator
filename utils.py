@@ -17,12 +17,18 @@ def surface(instance):
         output = instance.word
     elif type(instance) == str:
         return instance
-    while output[-2:] == "  ":
-        output = output[:-1]
-    
-    if output != "":
-        output = output + " "
+
     return output
+
+
+def swap(l, token1, token2):
+    i1 = l.index(token1)
+    i2 = l.index(token2)
+    l.remove(token1)
+    l.insert(i2, token1)
+    l.remove(token2)
+    l.insert(i1, token2)
+    return l
 
 
 
