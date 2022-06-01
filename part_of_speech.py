@@ -1,8 +1,12 @@
 import random
 import linguistics
 from vocabulary.semantic_classes import locations
+
+
+
+
 class noun:
-    def __init__(self, word, strong_or_weak, genus, ability_to_act):
+    def __init__(self, word, strong_or_weak, genus, ability_to_act, mass_noun):
         self.word = word
         self.genus = genus
         self.strong_or_weak = strong_or_weak
@@ -11,18 +15,21 @@ class noun:
         self.person = "3rd"
         self.number = random.choice(linguistics.numbers)
         self.case = "nominative"
-        if self.word in linguistics.no_plural_form:
+        self.mass_noun = mass_noun
+        if self.mass_noun:
             self.number = "singular"
         if self.word in [x[0] for x in locations.list_of_locations]:#only unse singular for locations
             self.number = "singular"
+        if self.word in(linguistics.nouns_without_plural_form):
+            self.mass_noun = True
     @classmethod
-    def from_list(cls, list_entry):
-        return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
+    def from_list(cls, list_entry):   
+        return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4])
     def declension(self):
         if self.word == "":
             return ""
         if self.number == "singular":
-            output = self.lemma
+            output = self.lemma 
         if self.number == "plural":  
             if self.strong_or_weak == "strong":
                 last_possible_umlaut = ""
@@ -49,6 +56,7 @@ class noun:
                     list_for_transformation = list(self.lemma)
                     list_for_transformation[self.lemma.index("o")] = 'ö'
                     self.lemma = ''.join(list_for_transformation) 
+                    
             if self.word[-3:] in("ent", "and", "ant", "ist") and self.genus == "masculine":
                 output = self.lemma + "en"
             elif  self.word[-1:] == "e" and self.genus == "masculine":
@@ -94,17 +102,24 @@ class noun:
                 output = self.lemma + "e"
             else: 
                 output = self.lemma + "s"
-        if self.case == "dative" and output[-1] == "e" and self.number == "plural":
-            output = output + "n"
-        if self.case == "dative" and output[-3:] == "ent" and self.number == "plural":
-            output = output + "en"
-        if self.case == "dative" and self.word in(linguistics.irregular_dative[0]):
-            output += "n"
-        if self.case == "dative" and self.number == "plural" and self.word in(linguistics.irregular_dative[1]):
-            output += "n"
-        if self.case == "dative" and self.word in(linguistics.irregular_dative[2]):
-            output += "en"
+        if self.case == "dative":
+            if self.number == "plural":
+                if output[-1] == "e":
+                    output = output + "n"
+                if output[-3:] == "ent":
+                    output = output + "en"
+                if self.word in(linguistics.irregular_dative[1]):
+                    output += "n"
+            if self.word in(linguistics.irregular_dative[2]) and output[-2:] != "en":
+                output += "en"
+        if self.case == "accusative" and not self.mass_noun :
+            if output[-1:] == "e":
+                output = output + "n"
+            elif output[-2:] == "ot":
+                output = output + "en"
+
         return output
+    
 
 class verb:
     def __init__(self, word, strong_or_weak, valency, object_case, θrolls, movement):
@@ -253,6 +268,7 @@ class proper_name:
         self.genus = genus
         self.person = "3rd"
         self.number = "singular"
+        self.mass_noun = False
     @classmethod
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1])
@@ -280,6 +296,7 @@ class pronoun:
             self.case = case
             self.noun_number = noun_number
             self.noun_genus = noun_genus
+            self.mass_noun = False
             if self.pronoun_type == "personal":
                 if self.number == "singular":
                     if self.person == "1st":
