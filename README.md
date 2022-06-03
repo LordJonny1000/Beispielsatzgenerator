@@ -2,7 +2,7 @@
 
 =======
 # Welcome to my project "Beispielsatzgenerator"!
-# This non-deterministic script receives annotated lists of words (one list for each part of speech, sored in the folder "vocabulary") and
+# This non-deterministic script receives annotated lists of words (one list for each part of speech, stored in the folder "vocabulary") and
 # generates a german sentence out of it, that is not only correct concerning syntax and morphology but makes sense aswell (at least in a wider sense).
 # This are the most important files so far:
 # "part_of_speech.py" contains a class for each part of speech, describing the required morphological processes that are necessary to form a sentence

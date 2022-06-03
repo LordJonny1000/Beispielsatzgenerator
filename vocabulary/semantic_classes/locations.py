@@ -6,4 +6,8 @@ list_of_locations = [
 ["Eckkneipe", "weak", "feminine", False, False],
 ["Hölle", "weak", "feminine", False, False],
 ["Nirvana", "weak", "neutral", False, False],
+["Ende der Welt", "weak", "neutral",  False, False],
+["Supermarkt", "strong", "masculine",  False, False],
+["Dancefloor","weak", "masculine",  False, False],
+["Kirche", "weak", "feminine",  False, False],
 ]

@@ -8,5 +8,7 @@ list_of_adjectives = [
 "abgefuckt", 
 "niedlich", 
 "verführerisch", 
-"gutaussehend", 
+"gutaussehend",
+"ganz",
+"traurig", 
 ]

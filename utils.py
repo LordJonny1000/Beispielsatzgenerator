@@ -23,7 +23,7 @@ def surface(instance):
     return output
 
 
-def generate_determinative(noun):
+def generate_determinative(noun, definite_article_only = False):
     det = part_of_speech.article(None, None, None)
     if noun.word == "":
         return det

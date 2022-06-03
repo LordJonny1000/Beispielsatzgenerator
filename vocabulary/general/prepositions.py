@@ -5,4 +5,13 @@ list_of_prepositions = [
 ["neben", "local", ["stay", "move"], ["dative", "accusative"]],
 ["bei", "local", ["stay"], ["dative"]],
 ["um", "local", ["move"], ["accusative"]],
+["in", "local", ["stay", "move"], ["dative", "accusative"]],
+["vor", ["local", "temporal"], ["stay", "move"], ["dative", "accusative"]],
+["an", "local", ["move"], ["accusative"]],
+["nach", "temporal", [], ["dative"]],
+["während", "temporal", ["period"], ["dative"]],
+["seit", "temporal", [], ["dative"]],
+["bis zu", "temporal", [], ["dative"]],
+["nach", "temporal", [], ["dative"]],
+["in", "temporal", ["period"], ["dative"]],
 ]

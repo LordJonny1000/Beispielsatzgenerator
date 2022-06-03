@@ -1,12 +1,12 @@
 import random
 import linguistics
-from vocabulary.semantic_classes import locations
+from vocabulary.semantic_classes import locations, events
 
 
 
 
 class noun:
-    def __init__(self, word, strong_or_weak, genus, ability_to_act, mass_noun):
+    def __init__(self, word, strong_or_weak, genus, ability_to_act, mass_noun, period = True):
         self.word = word
         self.genus = genus
         self.strong_or_weak = strong_or_weak
@@ -16,15 +16,19 @@ class noun:
         self.number = random.choice(linguistics.numbers)
         self.case = "nominative"
         self.mass_noun = mass_noun
+        self.period = period
         if self.mass_noun:
             self.number = "singular"
-        if self.word in [x[0] for x in locations.list_of_locations]:#only unse singular for locations
+        if self.word in [x[0] for x in locations.list_of_locations] or self.word in [x[0] for x in events.list_of_events]:#only unse singular for locations and events
             self.number = "singular"
         if self.word in(linguistics.nouns_without_plural_form):
             self.mass_noun = True
     @classmethod
-    def from_list(cls, list_entry):   
-        return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4])
+    def from_list(cls, list_entry):
+        if len(list_entry) == 5:
+            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4])
+        else:
+            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5])
     def declension(self):
         if self.word == "":
             return ""
@@ -106,18 +110,17 @@ class noun:
             if self.number == "plural":
                 if output[-1] == "e":
                     output = output + "n"
+                if output[-2:] == "el":
+                    output = output + "n"
                 if output[-3:] == "ent":
                     output = output + "en"
-                if self.word in(linguistics.irregular_dative[1]):
-                    output += "n"
-            if self.word in(linguistics.irregular_dative[2]) and output[-2:] != "en":
-                output += "en"
+            if self.word in(linguistics.dative_with_en) and output[-1] != "n":
+                output += "n"
         if self.case == "accusative" and not self.mass_noun :
-            if output[-1:] == "e":
+            if self.word in(linguistics.accusative_with_en) and output[-1] != "n":
                 output = output + "n"
             elif output[-2:] == "ot":
                 output = output + "en"
-
         return output
     
 
@@ -278,10 +281,10 @@ class proper_name:
 
     
 class preposition:
-        def __init__(self, word, preposition_type, possible_movement_modes, case):
+        def __init__(self, word, preposition_type, movement_or_period, case):
             self.word = word
             self.preposition_type = preposition_type
-            self.possible_movement_modes = possible_movement_modes
+            self.movement_or_period = movement_or_period
             self.case = case
         @classmethod
         def from_list(cls, list_entry):
@@ -410,8 +413,8 @@ class article:
         self.number = number
         self.genus = genus
         self.case = case
-        self.word = "Achtung, der Artikel konnte nicht gebildet werden!"  
-        if case == "nominative" or case == 0:
+        self.word = "Achtung, der Artikel konnte nicht gebildet werden!"
+        if case == "nominative":
             if article_type == "definite":
                 if number == "singular":
                     if genus == "masculine":

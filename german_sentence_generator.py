@@ -7,7 +7,7 @@ Created on Thu Jan 27 23:39:18 2022
 import random
 from vocabulary.general import verbs, adjectives, prepositions, nouns
 from vocabulary.proper_names import persons
-from vocabulary.semantic_classes import locations
+from vocabulary.semantic_classes import locations, events
 from copy import deepcopy as cp
 import part_of_speech
 import linguistics
@@ -20,7 +20,8 @@ def generate_sentence():
     list_of_adjectives = [part_of_speech.adjective.from_string(x) for x in adjectives.list_of_adjectives]
     list_of_persons = [part_of_speech.proper_name.from_list(x) for x in persons.list_of_persons]
     list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.list_of_prepositions]
-    list_of_locations = [part_of_speech.noun.from_list(x) for x in locations.list_of_locations]    
+    list_of_events = [part_of_speech.noun.from_list(x) for x in events.list_of_events]
+    list_of_locations = [part_of_speech.noun.from_list(x) for x in locations.list_of_locations]
 
     #set sentence mode
     x = probability_settings.interrogative_clause()
@@ -36,7 +37,7 @@ def generate_sentence():
         if predicate.lemma[:len(affix)] == affix:
             detached_affix_if_required = affix
             break
-    
+
     #generate subject
     if predicate.valency == 0:
         subject = part_of_speech.proper_name("es", "neutral")
@@ -45,6 +46,7 @@ def generate_sentence():
         subject = part_of_speech.proper_name("es", "neutral")
     subject.case = "nominative"
     subject_determinative = utils.generate_determinative(subject)
+    
         
     #generate subject adjective
     subject_adjective = part_of_speech.adjective("")
@@ -54,6 +56,9 @@ def generate_sentence():
                 subject_adjective = cp(random.choice(list_of_adjectives))
                 if type(subject) == part_of_speech.proper_name:
                     subject_determinative = part_of_speech.article("definite", "singular", subject.genus)
+    subject_determinative.noun_number = subject.number
+    subject_adjective.article_type, subject_adjective.number, subject_adjective.genus = subject_determinative.article_type, subject.number, subject.genus
+    subject_adjective.case = "nominative"
     
     #generate object1 if valency >= 2
     object1 = part_of_speech.noun("", None, None, None, None)
@@ -76,35 +81,55 @@ def generate_sentence():
     object2.case = "accusative"
     object2_determinative = utils.generate_determinative(object2)
 
+    #generate temporal_complement
+    event = part_of_speech.noun("", None, None, None, None)
+    event_preposition = part_of_speech.preposition("", "", "", "")
+    event_determinative = part_of_speech.article(None, None, None)
+    event_adjective = part_of_speech.adjective.from_string("")
+    if probability_settings.temporal_complement():
+        event_preposition = cp(random.choice([x for x in list_of_prepositions if "temporal" in (x.preposition_type)]))
+        if "period" in event_preposition.movement_or_period:
+            event = cp(random.choice([x for x in list_of_events if x.period]))
+        else:
+            event = cp(random.choice(list_of_events))
+        event.case = "dative"
+        event_determinative = utils.generate_determinative(event)
+        #generate event_adjective
+        event.number = "singular"
+        if probability_settings.event_adjective():
+            event_adjective = cp(random.choice(list_of_adjectives))
+            event_adjective.case = event.case
+    event_adjective.article_type, event_adjective.number, event_adjective.genus = event_determinative.article_type, "singular", event.genus
 
-    #generate prepositional_phrase
+    #generate local_complement
     location = part_of_speech.noun("", None, None, None, None)
-    preposition = part_of_speech.preposition("", "", "", "")
-    location_article = part_of_speech.article(None, None, None)
+    location_preposition = part_of_speech.preposition("", "", "", "")
+    location_determinative = part_of_speech.article(None, None, None)
     location_adjective = part_of_speech.adjective.from_string("")
-    if probability_settings.prepositional_phrase():
-        preposition = cp(random.choice([x for x in list_of_prepositions if predicate.movement in x.possible_movement_modes]))
+    if probability_settings.local_complement():
+        location_preposition = cp(random.choice([x for x in list_of_prepositions if "local" in (x.preposition_type) and predicate.movement in x.movement_or_period]))
         location = cp(random.choice(list_of_locations))
-        location_article = part_of_speech.article("definite", "singular", location.genus, preposition.case[preposition.possible_movement_modes.index(predicate.movement)])
+        location.case = location_preposition.case
+        if predicate.movement == "stay":
+            location.case = "dative"
+        else:
+            location.case = "accusative"
+        location_determinative = utils.generate_determinative(location)
         #generate location_adjective
         if probability_settings.location_adjective():
             location_adjective = cp(random.choice(list_of_adjectives))
+            location_adjective.case = location.case
+    location_adjective.article_type, location_adjective.number, location_adjective.genus = location_determinative.article_type, "singular", location.genus
 
     #assign syntactic relations
-    subject_determinative.noun_number = subject.number
-    subject_adjective.article_type, subject_adjective.number, subject_adjective.genus = subject_determinative.article_type, subject.number, subject.genus
-    subject_adjective.case = "nominative"
+    
     predicate.person, predicate.number = subject.person, subject.number
     object1_determinative.case = predicate.object_case
-    location_adjective.article_type, location_adjective.number, location_adjective.genus = location_article.article_type, "singular", location.genus
-    if predicate.movement == "stay":
-        location_adjective.case = "dative"
-    elif predicate.movement == "move":
-        location_adjective.case = "accusative" 
-
+    
     #initialize sentence
     sentence_list = [subject_determinative, subject_adjective, subject, predicate, object1_determinative, object1, \
-                     object2_determinative, object2, preposition, location_article, location_adjective, location, detached_affix_if_required]
+                     object2_determinative, object2, event_preposition, event_determinative, event_adjective, event,  \
+                         location_preposition, location_determinative, location_adjective, location, detached_affix_if_required]
     
     #adjust word order:
     if object2:
@@ -126,16 +151,13 @@ def generate_sentence():
     
     return output
 
-
-
 print(generate_sentence())
-
 
 
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "nn" not in x:
+#while "seinen Vögel" not in x:
 #   x = generate_sentence()
 #print(x)
 
