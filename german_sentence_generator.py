@@ -14,6 +14,8 @@ import linguistics
 import probability_settings
 import utils
 
+
+
 def generate_sentence():  
     list_of_nouns = [part_of_speech.noun.from_list(x) for x in nouns.list_of_nouns]
     list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.list_of_verbs]
@@ -144,6 +146,22 @@ def generate_sentence():
     #surface transformation
     output = " ".join([utils.surface(x) for x in sentence_list if len(utils.surface(x)) > 0])
     
+    #melting                
+    counter = 0
+    occuring_melt_words = []
+    for x in linguistics.melt_words:
+        if " " + x + " " in output:
+            for y in range(output.count(" " + x + " ")):
+                occuring_melt_words.append(x)
+            counter += output.count(" " + x + " ")
+    meltnum = random.randrange(counter + 1)
+    meltnum = 0
+    for x in range(meltnum):
+        thechoice = random.choice(occuring_melt_words)
+        occuring_melt_words.remove(thechoice)
+        output = output.replace(" " + thechoice + " ", " " + linguistics.melt_words[thechoice] + " ")
+    del meltnum, counter, occuring_melt_words             
+    
     #finish          
     while output[-1] == " ":
         output = output[:-1]
@@ -157,15 +175,17 @@ print(generate_sentence())
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "seinen Vögel" not in x:
+#while "der Fastenzeit" not in x:
 #   x = generate_sentence()
 #print(x)
+
+
 
 
     
 
 
-
+ #   am beim im vom zum ans ins zur 
 
 
 
