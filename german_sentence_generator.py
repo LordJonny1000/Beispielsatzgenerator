@@ -175,7 +175,7 @@ print(generate_sentence())
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "der Fastenzeit" not in x:
+#while "en hässlichen " not in x:
 #   x = generate_sentence()
 #print(x)
 
