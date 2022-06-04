@@ -227,13 +227,18 @@ class adjective:
                         return self.word + "e"
                     elif self.genus == "neutral":
                         return self.word + "es"
+                elif self.article_type == "possesive_pronoun":
+                    if self.genus == "masculine":
+                        return self.word + "er"
+                    elif self.genus == "neutral":
+                        return self.word + "es"
+                    else:
+                        return self.word + "e"
             elif self.number == "plural":
                 if self.article_type == "definite":
                     return self.word + "en"
                 elif self.article_type == "indefinite":
                     return self.word + "e"
-                
-            
             else:            
                 return self.word + "e"
         elif self.case=="dative":
@@ -241,13 +246,18 @@ class adjective:
         elif self.case=="accusative":
             if self.number =="singular":
                 if self.article_type == "definite":
-                    
                     if self.genus == "masculine":
-                        
                         return self.word + "en"
                     elif self.genus in("feminine", "neutral"):
                         return self.word + "e"
                 elif self.article_type == "indefinite":
+                    if self.genus == "masculine":
+                        return self.word + "en"
+                    elif self.genus == "feminine":
+                        return self.word + "e"
+                    elif self.genus == "neutral":
+                        return self.word + "es"
+                elif self.article_type == "possesive_pronoun":
                     if self.genus == "masculine":
                         return self.word + "en"
                     elif self.genus == "feminine":
@@ -321,7 +331,7 @@ class pronoun:
                     elif self.person == "3rd":
                         self.word =  "sie"
             elif self.pronoun_type == "possesive":
-                self.article_type = "determinative"
+                self.article_type = "possesive_pronoun"##########
                 if self.number == "singular":
                     if self.person == "1st":
                         self.word =  "mein"
