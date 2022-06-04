@@ -122,9 +122,8 @@ def generate_sentence():
             location_adjective = cp(random.choice(list_of_adjectives))
             location_adjective.case = location.case
     location_adjective.article_type, location_adjective.number, location_adjective.genus = location_determinative.article_type, "singular", location.genus
-
-    #assign syntactic relations
     
+    #assign syntactic relations
     predicate.person, predicate.number = subject.person, subject.number
     object1_determinative.case = predicate.object_case
     
@@ -139,9 +138,41 @@ def generate_sentence():
             sentence_list.remove(object2)
             sentence_list.insert(sentence_list.index(object1_determinative), object2)
     
+    #add interrogative clause
     if sentence_mode == "interrogative":
         sentence_list.remove(predicate)
         sentence_list.insert(0, predicate)
+        #add innterogative words
+        if random.randrange(2) < 1:
+            interrogative_words = cp(linguistics.interrogative_words)
+            if  predicate.valency < 2:
+                interrogative_words.remove("was")
+            interrogative_word = random.choice([x for x in interrogative_words])
+            if interrogative_word == "wer":
+              sentence_list.remove(subject)
+              sentence_list.remove(subject_adjective)
+              sentence_list.remove(subject_determinative)
+              predicate.person, predicate.number = "3rd", "singular"
+            if random.randrange(2) < 1:
+              if interrogative_word == "was":
+                  if predicate.object_case == "dative":
+                      interrogative_word = "wem"
+                  elif predicate.object_case == "accusative":
+                      interrogative_word = "wen"
+                  sentence_list.remove(object1)
+                  sentence_list.remove(object1_determinative)
+            elif interrogative_word == "wo":
+                sentence_list.remove(location)
+                sentence_list.remove(location_determinative)
+                sentence_list.remove(location_adjective)
+            elif interrogative_word == "wann":
+                sentence_list.remove(event)
+                sentence_list.remove(event_determinative)
+                sentence_list.remove(event_adjective)
+            sentence_list = [interrogative_word] + sentence_list
+            
+    
+    
     
     #surface transformation
     output = " ".join([utils.surface(x) for x in sentence_list if len(utils.surface(x)) > 0])
@@ -163,7 +194,7 @@ def generate_sentence():
     del meltnum, counter, occuring_melt_words             
     
     #finish          
-    while output[-1] == " ":
+    while output[-1] in(" ", ","):
         output = output[:-1]
     output = output[0].upper() + output[1:] + closing_punctuation_mark
     
@@ -175,17 +206,16 @@ print(generate_sentence())
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "en hässlichen " not in x:
+#while "Wem" not in x:
 #   x = generate_sentence()
 #print(x)
 
 
 
 
-    
 
 
- #   am beim im vom zum ans ins zur 
+
 
 
 

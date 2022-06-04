@@ -89,7 +89,7 @@ class noun:
                     output = self.lemma + "en"
             elif self.word[-4:] == "ling" and self.genus == "masculine":
                 output = self.lemma + "e"
-            elif self.word[-3:] in("eur","ich", "ier", "uhl", "ehl", "rzt") and self.genus == "masculine":
+            elif self.word[-3:] in("eur","ich", "ier", "uhl", "ehl", "rzt", "hof") and self.genus == "masculine":
                 output = self.lemma + "e"
             elif self.word[-2:] in("ig", "ör", "al", "äl") and self.genus == "masculine":
                 output = self.lemma + "e"

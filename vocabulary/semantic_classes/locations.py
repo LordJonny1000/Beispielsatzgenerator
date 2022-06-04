@@ -10,4 +10,5 @@ list_of_locations = [
 ["Supermarkt", "strong", "masculine",  False, False],
 ["Dancefloor","weak", "masculine",  False, False],
 ["Kirche", "weak", "feminine",  False, False],
+["Friedhof", "strong", "masculine",  False, False],
 ]
