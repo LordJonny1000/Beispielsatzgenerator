@@ -75,11 +75,12 @@ def generate_sentence():
            object1 = cp(random.choice([random.choice(list_of_persons), random.choice([x for x in list_of_nouns if x.ability_to_act]), part_of_speech.pronoun("reflexive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), predicate.object_case)]))
     object1.case = predicate.object_case
     object1_determinative = utils.generate_determinative(object1)
-    object1.determinative = object1_determinative
     if probability("object1_adjective"):
         if type(object1) == part_of_speech.proper_name:
             object1_determinative = part_of_speech.article("definite", "singular", object1.genus, object1.case)
+        object1.determinative = object1_determinative
         object1_adjective = utils.generate_adjective(object1)
+        
         
     #generate object2 if valency >= 3
     if predicate.valency >= 3:
