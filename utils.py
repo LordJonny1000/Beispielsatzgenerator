@@ -9,26 +9,17 @@ from vocabulary.general import adjectives
 adjectives = [part_of_speech.adjective.from_string(x) for x in adjectives.list_of_adjectives]
 
 def surface(instance):
-    if type(instance) == part_of_speech.noun:
+    if type(instance) in(part_of_speech.noun, part_of_speech.adjective):
         output = instance.declension()
-    if type(instance) == part_of_speech.adjective:
-        output = instance.declension()
-    elif type(instance) == part_of_speech.verb:
+    elif type(instance) in([part_of_speech.verb]):
         output = instance.conjugation()
-    elif type(instance) == part_of_speech.article:
-        output = instance.word
-    elif type(instance) == part_of_speech.pronoun:
-        output = instance.word
-    elif type(instance) == part_of_speech.proper_name:
-        output = instance.word
-    elif type(instance) == part_of_speech.preposition:
+    elif type(instance) in(part_of_speech.article, part_of_speech.pronoun, part_of_speech.proper_name, part_of_speech.preposition):
         output = instance.word
     elif type(instance) == str:
         return instance
     return output
 
-
-def generate_determinative(noun, definite_article_only = False):
+def generate_determinative(noun):
     det = part_of_speech.article(None, None, None)
     if noun.word == "":
         return det
@@ -43,14 +34,14 @@ def generate_determinative(noun, definite_article_only = False):
             det = part_of_speech.article("indefinite", "plural", noun.genus)
     return det
 
-def generate_adjective(target, det):
+def generate_adjective(target):
+    det = target.determinative
     adjective = part_of_speech.adjective("")
     if target.word == "" or type(target) == part_of_speech.pronoun:
         return adjective
     adjective = cp(random.choice(adjectives))
     adjective.genus, adjective.case, adjective.number, adjective.article_type = target.genus, target.case, target.number, det.article_type
     return adjective
-    
 
         
 

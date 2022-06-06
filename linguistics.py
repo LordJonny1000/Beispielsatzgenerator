@@ -12,6 +12,6 @@ dative_with_n_plural_only = ["Igel", "Vogel"]
 dative_with_en = ["Hase", "Bruchpilot"]
 accusative_with_en = ["Hase","Bruchpilot"]
 nouns_without_plural_form = ["Abendessen"]
-melt_words = {"an dem":"am", "bei dem":"beim", "in dem":"im", "von dem":"vom", "zu dem":"zum", "an das":"ans", "in das":"ins", "zu der":"zur"}
+contraction_words = {"an dem":"am", "bei dem":"beim", "in dem":"im", "von dem":"vom", "zu dem":"zum", "an das":"ans", "in das":"ins", "zu der":"zur"}
 interrogative_words = ["warum", "weshalb", "wieso", "wann", "wo", "wer", "was", "wie"]
 
