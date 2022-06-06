@@ -24,6 +24,21 @@ def generate_sentence():
     list_of_events = [part_of_speech.noun.from_list(x) for x in events.list_of_events]
     list_of_locations = [part_of_speech.noun.from_list(x) for x in locations.list_of_locations]
 
+    #initialize
+    detached_affix_if_required = ""
+    subject_adjective = part_of_speech.adjective("")
+    object1 = part_of_speech.noun("", None, None, None, None)
+    object1_adjective = part_of_speech.adjective.from_string("")
+    object2 = part_of_speech.noun("", None, None, None, None)
+    event = part_of_speech.noun("", None, None, None, None)
+    event_preposition = part_of_speech.preposition("", "", "", "")
+    event_determinative = part_of_speech.article(None, None, None)
+    event_adjective = part_of_speech.adjective.from_string("")
+    location = part_of_speech.noun("", None, None, None, None)
+    location_preposition = part_of_speech.preposition("", "", "", "")
+    location_determinative = part_of_speech.article(None, None, None)
+    location_adjective = part_of_speech.adjective.from_string("")
+
     #set sentence mode
     x = probability_settings.interrogative_clause()
     sentence_mode = linguistics.sentence_modes[x]
@@ -32,7 +47,6 @@ def generate_sentence():
     
     #generate predicate
     predicate = cp(random.choice(list_of_verbs))
-    detached_affix_if_required = ""
     for affix in linguistics.detached_affixes:
         if predicate.lemma[:len(affix)] == affix:
             detached_affix_if_required = affix
@@ -44,13 +58,10 @@ def generate_sentence():
         subject = part_of_speech.proper_name("es", "neutral")
     subject.case = "nominative"
     subject_determinative = utils.generate_determinative(subject)
-    
-    
     predicate.person, predicate.number = subject.person, subject.number
     
         
     #generate subject adjective
-    subject_adjective = part_of_speech.adjective("")
     if probability_settings.subject_adjective() and predicate.valency != 0 and type(subject) != part_of_speech.pronoun:
         if type(subject) == part_of_speech.proper_name:
             subject_determinative = part_of_speech.article("definite", "singular", subject.genus)
@@ -58,8 +69,6 @@ def generate_sentence():
 
     
     #generate object1 if valency >= 2
-    object1 = part_of_speech.noun("", None, None, None, None)
-    object1_adjective = part_of_speech.adjective.from_string("")
     if predicate.valency >= 2:
         if predicate.θrolls[1] == "patient":
            object1 = cp(random.choice([random.choice(list_of_persons), random.choice(list_of_nouns), part_of_speech.pronoun("reflexive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), predicate.object_case)]))
@@ -75,7 +84,6 @@ def generate_sentence():
             
      
     #generate object2 if valency >= 3
-    object2 = part_of_speech.noun("", None, None, None, None)
     if predicate.valency >= 3:
         if predicate.θrolls[2] == "patient":
            object2 = cp(random.choice([random.choice(list_of_persons), random.choice(list_of_nouns), part_of_speech.pronoun("reflexive", "3rd", random.choice(linguistics.numbers), random.choice(linguistics.genera), "accusative")]))
@@ -86,10 +94,6 @@ def generate_sentence():
 
 
     #generate temporal_complement
-    event = part_of_speech.noun("", None, None, None, None)
-    event_preposition = part_of_speech.preposition("", "", "", "")
-    event_determinative = part_of_speech.article(None, None, None)
-    event_adjective = part_of_speech.adjective.from_string("")
     if probability_settings.temporal_complement():
         event_preposition = cp(random.choice([x for x in list_of_prepositions if "temporal" in (x.preposition_type)]))
         if "period" in event_preposition.movement_or_period:
@@ -104,10 +108,6 @@ def generate_sentence():
             event_adjective = utils.generate_adjective(event, event_determinative)
 
     #generate local_complement
-    location = part_of_speech.noun("", None, None, None, None)
-    location_preposition = part_of_speech.preposition("", "", "", "")
-    location_determinative = part_of_speech.article(None, None, None)
-    location_adjective = part_of_speech.adjective.from_string("")
     if probability_settings.local_complement():
         location_preposition = cp(random.choice([x for x in list_of_prepositions if "local" in (x.preposition_type) and predicate.movement in x.movement_or_period]))
         location = cp(random.choice(list_of_locations))
@@ -180,13 +180,12 @@ def generate_sentence():
             for y in range(output.count(" " + x + " ")):
                 occuring_contraction_words.append(x)
             counter += output.count(" " + x + " ")
-    meltnum = random.randrange(counter + 1)
-    meltnum = 0
-    for x in range(meltnum):
+    contracnum = random.randrange(counter + 1)
+    for x in range(contracnum):
         thechoice = random.choice(occuring_contraction_words)
         occuring_contraction_words.remove(thechoice)
         output = output.replace(" " + thechoice + " ", " " + linguistics.contraction_words[thechoice] + " ")
-    del meltnum, counter, occuring_contraction_words             
+    del contracnum, counter, occuring_contraction_words             
     
     #finish          
     while output[-1] in(" ", ","):
@@ -195,15 +194,15 @@ def generate_sentence():
     
     return output
 
-print(generate_sentence())
+#print(generate_sentence())
 
 
 
 #pseudo function for reproducing error
-#x = generate_sentence()
-#while "in der Paarungszeit" not in x:
-#   x = generate_sentence()
-#print(x)
+x = generate_sentence()
+while "am" not in x:
+   x = generate_sentence()
+print(x)
 
 
 
