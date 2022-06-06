@@ -5,7 +5,7 @@ Created on Thu Jan 27 23:39:18 2022
 @author: jonny
 """
 import random
-from vocabulary.general import verbs, adjectives, prepositions, nouns
+from vocabulary.general import verbs, prepositions, nouns
 from vocabulary.proper_names import persons
 from vocabulary.semantic_classes import locations, events
 from copy import deepcopy as cp
@@ -19,7 +19,6 @@ import utils
 def generate_sentence():  
     list_of_nouns = [part_of_speech.noun.from_list(x) for x in nouns.list_of_nouns]
     list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.list_of_verbs]
-    list_of_adjectives = [part_of_speech.adjective.from_string(x) for x in adjectives.list_of_adjectives]
     list_of_persons = [part_of_speech.proper_name.from_list(x) for x in persons.list_of_persons]
     list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.list_of_prepositions]
     list_of_events = [part_of_speech.noun.from_list(x) for x in events.list_of_events]
@@ -155,6 +154,7 @@ def generate_sentence():
                   elif predicate.object_case == "accusative":
                       interrogative_word = "wen"
                   sentence_list.remove(object1)
+                  sentence_list.remove(object1_adjective)
                   sentence_list.remove(object1_determinative)
             elif interrogative_word == "wo":
                 sentence_list.remove(location)
@@ -172,21 +172,21 @@ def generate_sentence():
     #surface transformation
     output = " ".join([utils.surface(x) for x in sentence_list if len(utils.surface(x)) > 0])
     
-    #melting                
+    #contraction               
     counter = 0
-    occuring_melt_words = []
-    for x in linguistics.melt_words:
+    occuring_contraction_words = []
+    for x in linguistics.contraction_words:
         if " " + x + " " in output:
             for y in range(output.count(" " + x + " ")):
-                occuring_melt_words.append(x)
+                occuring_contraction_words.append(x)
             counter += output.count(" " + x + " ")
     meltnum = random.randrange(counter + 1)
     meltnum = 0
     for x in range(meltnum):
-        thechoice = random.choice(occuring_melt_words)
-        occuring_melt_words.remove(thechoice)
-        output = output.replace(" " + thechoice + " ", " " + linguistics.melt_words[thechoice] + " ")
-    del meltnum, counter, occuring_melt_words             
+        thechoice = random.choice(occuring_contraction_words)
+        occuring_contraction_words.remove(thechoice)
+        output = output.replace(" " + thechoice + " ", " " + linguistics.contraction_words[thechoice] + " ")
+    del meltnum, counter, occuring_contraction_words             
     
     #finish          
     while output[-1] in(" ", ","):
