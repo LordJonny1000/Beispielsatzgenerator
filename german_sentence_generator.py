@@ -21,11 +21,6 @@ list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in preposi
 list_of_events = [part_of_speech.noun.from_list(x) for x in events.list_of_events]
 list_of_locations = [part_of_speech.noun.from_list(x) for x in locations.list_of_locations]
 
-
-
-
-
-
 def generate_sentence():  
     
     #initialize
@@ -64,12 +59,12 @@ def generate_sentence():
     subject.case = "nominative"
     subject_determinative = utils.generate_determinative(subject)
     predicate.person, predicate.number = subject.person, subject.number
-    subject.determinative = subject_determinative
     
     #generate subject adjective
     if probability("subject_adjective") and predicate.valency != 0 and type(subject) != part_of_speech.pronoun:
         if type(subject) == part_of_speech.proper_name:
             subject_determinative = part_of_speech.article("definite", "singular", subject.genus)
+        subject.determinative = subject_determinative
         subject_adjective = utils.generate_adjective(subject)   
 
     #generate object1 if valency >= 2
@@ -105,7 +100,7 @@ def generate_sentence():
         event.case = "dative"
         event.number = "singular"
         event_determinative = utils.generate_determinative(event)
-        event.determinative = event.determinative
+        event.determinative = event_determinative
         #generate event_adjective
         if probability("event_adjective"):
             event_adjective = utils.generate_adjective(event)
