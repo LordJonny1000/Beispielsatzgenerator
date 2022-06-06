@@ -114,13 +114,17 @@ class noun:
                     output = output + "n"
                 if output[-3:] == "ent":
                     output = output + "en"
-            if self.word in(linguistics.dative_with_en) and output[-1] != "n":
-                output += "n"
+            if self.word in(linguistics.dative_with_en):
+                if output[-1] != "e" and output[-2] != "e":
+                    output += "e"
+                if output[-1] != "n":
+                    output += "n"   
         if self.case == "accusative" and not self.mass_noun :
-            if self.word in(linguistics.accusative_with_en) and output[-1] != "n":
-                output = output + "n"
-            elif output[-2:] == "ot":
-                output = output + "en"
+            if self.word in(linguistics.accusative_with_en):
+                if output[-1] != "e" and output[-2] != "e":
+                    output += "e"
+                if output[-1] != "n":
+                    output += "n"
         return output
     
 
@@ -235,9 +239,9 @@ class adjective:
                     else:
                         return self.word + "e"
             elif self.number == "plural":
-                if self.article_type == "definite":
+                if self.article_type in("definite", "possesive_pronoun"):
                     return self.word + "en"
-                elif self.article_type == "indefinite":
+                elif self.article_type in (["indefinite"]):
                     return self.word + "e"
             else:            
                 return self.word + "e"
@@ -272,7 +276,7 @@ class adjective:
             return self.word
         else:
             return self.word
-        return ""
+        return self.word+"!!"#
             
 class proper_name:
 

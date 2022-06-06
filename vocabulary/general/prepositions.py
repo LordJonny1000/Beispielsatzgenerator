@@ -5,7 +5,7 @@ list_of_prepositions = [
 ["neben", "local", ["stay", "move"], ["dative", "accusative"]],
 ["bei", "local", ["stay"], ["dative"]],
 ["um", "local", ["move"], ["accusative"]],
-["in", ["local", "temporal"], ["stay", "move"], ["dative", "accusative"]],
+["in", ["local", "temporal"], ["stay", "move", "period"], ["dative", "accusative"]],
 ["vor", ["local", "temporal"], ["stay", "move"], ["dative", "accusative"]],
 ["an", ["local", "temporal"], ["move", "period"], ["accusative"]],
 ["nach", "temporal", [], ["dative"]],

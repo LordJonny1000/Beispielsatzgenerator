@@ -32,7 +32,6 @@ def generate_sentence():
     del x
     
     #generate predicate
-    #predicate = cp(random.choice(list_of_verbs))
     predicate = cp(random.choice(list_of_verbs))
     detached_affix_if_required = ""
     for affix in linguistics.detached_affixes:
@@ -41,29 +40,27 @@ def generate_sentence():
             break
 
     #generate subject
-    if predicate.valency == 0:
-        subject = part_of_speech.proper_name("es", "neutral")
     subject = cp(random.choice([random.choice(list_of_persons), part_of_speech.pronoun("personal", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), None), random.choice([x for x in list_of_nouns if x.ability_to_act])]))
     if predicate.valency == 0:
         subject = part_of_speech.proper_name("es", "neutral")
     subject.case = "nominative"
     subject_determinative = utils.generate_determinative(subject)
     
+    
+    predicate.person, predicate.number = subject.person, subject.number
+    
         
     #generate subject adjective
     subject_adjective = part_of_speech.adjective("")
-    if probability_settings.subject_adjective():
-        if predicate.valency != 0:
-            if type(subject) != part_of_speech.pronoun:
-                subject_adjective = cp(random.choice(list_of_adjectives))
-                if type(subject) == part_of_speech.proper_name:
-                    subject_determinative = part_of_speech.article("definite", "singular", subject.genus)
-    subject_determinative.noun_number = subject.number
-    subject_adjective.article_type, subject_adjective.number, subject_adjective.genus = subject_determinative.article_type, subject.number, subject.genus
-    subject_adjective.case = "nominative"
+    if probability_settings.subject_adjective() and predicate.valency != 0 and type(subject) != part_of_speech.pronoun:
+        if type(subject) == part_of_speech.proper_name:
+            subject_determinative = part_of_speech.article("definite", "singular", subject.genus)
+        subject_adjective = utils.generate_adjective(subject, subject_determinative)   
+
     
     #generate object1 if valency >= 2
     object1 = part_of_speech.noun("", None, None, None, None)
+    object1_adjective = part_of_speech.adjective.from_string("")
     if predicate.valency >= 2:
         if predicate.θrolls[1] == "patient":
            object1 = cp(random.choice([random.choice(list_of_persons), random.choice(list_of_nouns), part_of_speech.pronoun("reflexive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), predicate.object_case)]))
@@ -71,6 +68,11 @@ def generate_sentence():
            object1 = cp(random.choice([random.choice(list_of_persons), random.choice([x for x in list_of_nouns if x.ability_to_act]), part_of_speech.pronoun("reflexive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), predicate.object_case)]))
     object1.case = predicate.object_case
     object1_determinative = utils.generate_determinative(object1)
+    if probability_settings.object1_adjective():
+        if type(object1) == part_of_speech.proper_name:
+            object1_determinative = part_of_speech.article("definite", "singular", object1.genus, object1.case)
+        object1_adjective = utils.generate_adjective(object1, object1_determinative)
+        
             
      
     #generate object2 if valency >= 3
@@ -82,6 +84,7 @@ def generate_sentence():
            object2 = cp(random.choice([random.choice(list_of_persons), [x for x in list_of_nouns if x.ability_to_act][0], part_of_speech.pronoun("reflexive", "3rd", random.choice(linguistics.numbers), random.choice(linguistics.genera), predicate.object_case)]))
     object2.case = "accusative"
     object2_determinative = utils.generate_determinative(object2)
+
 
     #generate temporal_complement
     event = part_of_speech.noun("", None, None, None, None)
@@ -95,13 +98,11 @@ def generate_sentence():
         else:
             event = cp(random.choice(list_of_events))
         event.case = "dative"
+        event.number = "singular"
         event_determinative = utils.generate_determinative(event)
         #generate event_adjective
-        event.number = "singular"
         if probability_settings.event_adjective():
-            event_adjective = cp(random.choice(list_of_adjectives))
-            event_adjective.case = event.case
-    event_adjective.article_type, event_adjective.number, event_adjective.genus = event_determinative.article_type, "singular", event.genus
+            event_adjective = utils.generate_adjective(event, event_determinative)
 
     #generate local_complement
     location = part_of_speech.noun("", None, None, None, None)
@@ -119,16 +120,10 @@ def generate_sentence():
         location_determinative = utils.generate_determinative(location)
         #generate location_adjective
         if probability_settings.location_adjective():
-            location_adjective = cp(random.choice(list_of_adjectives))
-            location_adjective.case = location.case
-    location_adjective.article_type, location_adjective.number, location_adjective.genus = location_determinative.article_type, "singular", location.genus
-    
-    #assign syntactic relations
-    predicate.person, predicate.number = subject.person, subject.number
-    object1_determinative.case = predicate.object_case
+            location_adjective = utils.generate_adjective(location, location_determinative)
     
     #initialize sentence
-    sentence_list = [subject_determinative, subject_adjective, subject, predicate, object1_determinative, object1, \
+    sentence_list = [subject_determinative, subject_adjective, subject, predicate, object1_determinative, object1_adjective, object1, \
                      object2_determinative, object2, event_preposition, event_determinative, event_adjective, event,  \
                          location_preposition, location_determinative, location_adjective, location, detached_affix_if_required]
     
@@ -206,18 +201,9 @@ print(generate_sentence())
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "Wem" not in x:
+#while "in der Paarungszeit" not in x:
 #   x = generate_sentence()
 #print(x)
-
-
-
-
-
-
-
-
-
 
 
 
