@@ -1,9 +1,11 @@
+from part_of_speech import noun
+
 list_of_locations = [
 ["Keller", "weak", "masculine", False, False],
 ["Flughafen", "strong", "masculine", False, False],
 ["Disco", "weak", "feminine", False, False],
 ["Boxring", "weak", "masculine", False, False],
-["Eckkneipe", "weak", "feminine", False, False],
+["Stammkneipe", "weak", "feminine", False, False],
 ["Hölle", "weak", "feminine", False, False],
 ["Nirvana", "weak", "neutral", False, False],
 ["Ende der Welt", "weak", "neutral",  False, False],
@@ -12,3 +14,5 @@ list_of_locations = [
 ["Kirche", "weak", "feminine",  False, False],
 ["Friedhof", "strong", "masculine",  False, False],
 ]
+
+

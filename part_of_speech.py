@@ -1,34 +1,93 @@
 import random
 import linguistics
-from vocabulary.semantic_classes import locations, events
 
-
-
+class adjective:
+    def __init__(self, word):
+        self.word = word
+    @classmethod
+    def from_string(cls, string):
+        return cls(string)
+    def declension(self):
+        if self.word == "":
+            return ""
+        if self.case=="nominative":
+            if self.number == "singular":
+                if self.article_type == "definite":
+                    return self.word + "e"
+                elif self.article_type == "indefinite":
+                    if self.genus == "masculine":
+                        return self.word + "er"
+                    elif self.genus == "feminine":
+                        return self.word + "e"
+                    elif self.genus == "neutral":
+                        return self.word + "es"
+                elif self.article_type == "possesive_pronoun":
+                    if self.genus == "masculine":
+                        return self.word + "er"
+                    elif self.genus == "neutral":
+                        return self.word + "es"
+                    else:
+                        return self.word + "e"
+            elif self.number == "plural":
+                if self.article_type in("definite", "possesive_pronoun"):
+                    return self.word + "en"
+                elif self.article_type in (["indefinite"]):
+                    return self.word + "e"
+            else:            
+                return self.word + "e"
+        elif self.case=="dative":
+            return self.word + "en"
+        elif self.case=="accusative":
+            if self.number =="singular":
+                if self.article_type == "definite":
+                    if self.genus == "masculine":
+                        return self.word + "en"
+                    elif self.genus in("feminine", "neutral"):
+                        return self.word + "e"
+                elif self.article_type == "indefinite":
+                    if self.genus == "masculine":
+                        return self.word + "en"
+                    elif self.genus == "feminine":
+                        return self.word + "e"
+                    elif self.genus == "neutral":
+                        return self.word + "es"
+                elif self.article_type == "possesive_pronoun":
+                    if self.genus == "masculine":
+                        return self.word + "en"
+                    elif self.genus == "feminine":
+                        return self.word + "e"
+                    elif self.genus == "neutral":
+                        return self.word + "es"
+            elif self.number == "plural":
+                if self.article_type in ("definite", "possessive_pronoun"):
+                    return self.word + "en"
+                elif self.article_type == "indefinite":
+                    return self.word + "e"
+            return self.word
+        else:
+            return self.word
+        return self.word+"!!"#
 
 class noun:
-    def __init__(self, word, strong_or_weak, genus, ability_to_act, mass_noun, period = True):
+    def __init__(self, word, strong_or_weak, genus, semantic_class, mass_noun = False):
         self.word = word
         self.genus = genus
         self.strong_or_weak = strong_or_weak
         self.lemma = self.word
-        self.ability_to_act = ability_to_act
-        self.person = "3rd"
+        self.semantic_class = semantic_class
         self.number = random.choice(linguistics.numbers)
+        self.person = "3rd"
         self.case = "nominative"
         self.mass_noun = mass_noun
-        self.period = period
-        if self.mass_noun:
+        self.adjective = adjective.from_string("")
+        if self.mass_noun or self.word in(linguistics.nouns_without_plural_form) or self.semantic_class in("location", "event"):
             self.number = "singular"
-        if self.word in [x[0] for x in locations.list_of_locations] or self.word in [x[0] for x in events.list_of_events]:#only unse singular for locations and events
-            self.number = "singular"
-        if self.word in(linguistics.nouns_without_plural_form):
-            self.mass_noun = True
     @classmethod
     def from_list(cls, list_entry):
-        if len(list_entry) == 5:
+        if len(list_entry) == 4:
+            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
+        elif len(list_entry) == 5:
             return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4])
-        else:
-            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5])
     def declension(self):
         if self.word == "":
             return ""
@@ -127,7 +186,6 @@ class noun:
                     output += "n"
         return output
     
-
 class verb:
     def __init__(self, word, strong_or_weak, valency, object_case, θrolls, movement):
         self.word = word
@@ -136,6 +194,8 @@ class verb:
         self.object_case = object_case
         self.θrolls = θrolls
         self.movement = movement
+        if type(self.movement) == list:
+            self.movement = random.choice(self.movement)
         if self.word[-2:] == "en":
             self.lemma = self.word[:-2]
         else:
@@ -208,76 +268,7 @@ class verb:
         if self.person == "2nd" and self.number == "singular" and self.word in("sehen", "zusehen"):
             output =  "siehst"
         return output
-
-
-
-class adjective:
-    def __init__(self, word):
-        self.word = word
-    @classmethod
-    def from_string(cls, string):
-        return cls(string)
-    def declension(self):
-        if self.word == "":
-            return ""
-        if self.case=="nominative":
-            if self.number == "singular":
-                if self.article_type == "definite":
-                    return self.word + "e"
-                elif self.article_type == "indefinite":
-                    if self.genus == "masculine":
-                        return self.word + "er"
-                    elif self.genus == "feminine":
-                        return self.word + "e"
-                    elif self.genus == "neutral":
-                        return self.word + "es"
-                elif self.article_type == "possesive_pronoun":
-                    if self.genus == "masculine":
-                        return self.word + "er"
-                    elif self.genus == "neutral":
-                        return self.word + "es"
-                    else:
-                        return self.word + "e"
-            elif self.number == "plural":
-                if self.article_type in("definite", "possesive_pronoun"):
-                    return self.word + "en"
-                elif self.article_type in (["indefinite"]):
-                    return self.word + "e"
-            else:            
-                return self.word + "e"
-        elif self.case=="dative":
-            return self.word + "en"
-        elif self.case=="accusative":
-            if self.number =="singular":
-                if self.article_type == "definite":
-                    if self.genus == "masculine":
-                        return self.word + "en"
-                    elif self.genus in("feminine", "neutral"):
-                        return self.word + "e"
-                elif self.article_type == "indefinite":
-                    if self.genus == "masculine":
-                        return self.word + "en"
-                    elif self.genus == "feminine":
-                        return self.word + "e"
-                    elif self.genus == "neutral":
-                        return self.word + "es"
-                elif self.article_type == "possesive_pronoun":
-                    if self.genus == "masculine":
-                        return self.word + "en"
-                    elif self.genus == "feminine":
-                        return self.word + "e"
-                    elif self.genus == "neutral":
-                        return self.word + "es"
-            elif self.number == "plural":
-                if self.article_type == "definite":
-                    return self.word + "en"
-                elif self.article_type == "indefinite":
-                    return self.word + "e"
-            return self.word
-        else:
-            return self.word
-        return self.word+"!!"#
-            
+          
 class proper_name:
 
     def __init__(self, word, genus):
@@ -285,20 +276,20 @@ class proper_name:
         self.genus = genus
         self.person = "3rd"
         self.number = "singular"
+        self.adjective = adjective.from_string("")
+        self.semantic_class = "proper_name"
         self.mass_noun = False
     @classmethod
     def from_list(cls, list_entry):
         return cls(list_entry[0], list_entry[1])
     def declension(self):
         return self.word
-
-
-    
+ 
 class preposition:
-        def __init__(self, word, preposition_type, movement_or_period, case):
+        def __init__(self, word, preposition_type, movement_modes, case):
             self.word = word
             self.preposition_type = preposition_type
-            self.movement_or_period = movement_or_period
+            self.movement_modes = movement_modes
             self.case = case
         @classmethod
         def from_list(cls, list_entry):
@@ -313,7 +304,9 @@ class pronoun:
             self.case = case
             self.noun_number = noun_number
             self.noun_genus = noun_genus
+            self.semantic_class = None
             self.mass_noun = False
+            self.adjective = adjective.from_string("")
             if self.pronoun_type == "personal":
                 if self.number == "singular":
                     if self.person == "1st":
@@ -335,7 +328,7 @@ class pronoun:
                     elif self.person == "3rd":
                         self.word =  "sie"
             elif self.pronoun_type == "possesive":
-                self.article_type = "possesive_pronoun"##########
+                self.article_type = "possesive_pronoun"
                 if self.number == "singular":
                     if self.person == "1st":
                         self.word =  "mein"

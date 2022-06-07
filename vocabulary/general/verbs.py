@@ -1,7 +1,7 @@
 list_of_verbs = [
 ["gefallen", "strong", 2, "dative", ["patient", "experiencer"], "stay"],
 ["schneien", "weak", 0, 0, 0, "stay"],
-["regnen", "weak", 0, 0, 0, "stay"],  
+["regnen", "weak", 0, 0, 0, "stay"],
 ["vergessen", "strong", 2, "accusative", ["agent", "patient"], "stay"],
 ["lesen", "strong", 1, 0, ["agent"], "stay"],
 ["saufen", "strong", 1, 0, ["agent"], "stay"],
@@ -28,5 +28,7 @@ list_of_verbs = [
 ["austricksen", "weak", 2, "accusative", ["agent", "experiencer"], "stay"],
 ["fliegen", "weak", 1, 0, ["agent"], "move"],
 ["zeigen", "weak", 3, "dative", ["agent", "experiencer", "patient"], "stay"],
-["geben", "strong", 3, "dative", ["agent", "experiencer", "patient"], "stay"], #maybe add annotation that no person can be chosen as object2
+["geben", "strong", 3, "dative", ["agent", "experiencer", "patient"], "stay"],
+["anzünden", "weak", 2, "accusative", ["agent", "patient"], "stay"],
+["jagen", "weak", 2, "accusative", ["agent", "patient"], ["stay", "move"]],
 ]
