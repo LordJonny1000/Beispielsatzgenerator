@@ -1,4 +1,4 @@
-list_of_nouns = [
+as_list = [
 ["Igel", "weak", "masculine", "animal"],
 ["Schiff", "weak", "neutral", None],
 ["Blase", "weak", "feminine", None],

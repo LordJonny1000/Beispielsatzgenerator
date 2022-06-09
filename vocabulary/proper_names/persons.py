@@ -1,4 +1,4 @@
-list_of_persons = [
+as_list = [
 ["Robert", "masculine"],
 ["Helmut", "masculine"],
 ["Berthold", "masculine"],

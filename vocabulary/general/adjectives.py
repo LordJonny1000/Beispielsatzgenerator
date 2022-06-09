@@ -1,4 +1,4 @@
-list_of_adjectives = [
+as_list = [
 "hässlich", 
 "pummelig", 
 "gottverdammt", 

@@ -1,6 +1,6 @@
 from part_of_speech import noun
 
-list_of_locations = [
+as_list = [
 ["Keller", "weak", "masculine", False, False],
 ["Flughafen", "strong", "masculine", False, False],
 ["Disco", "weak", "feminine", False, False],
@@ -13,6 +13,7 @@ list_of_locations = [
 ["Dancefloor","weak", "masculine",  False, False],
 ["Kirche", "weak", "feminine",  False, False],
 ["Friedhof", "strong", "masculine",  False, False],
+["Schule", "weak", "feminine",  False, False],
 ]
 
 

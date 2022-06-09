@@ -1,4 +1,4 @@
-list_of_prepositions = [
+as_list = [
 ["auf", "local", ["stay", "move"], ["dative", "accusative"]],
 ["hinter", "local", ["stay", "move"], ["dative", "accusative"]],
 ["unter", "local", ["stay", "move"], ["dative", "accusative"]],
@@ -11,6 +11,6 @@ list_of_prepositions = [
 ["nach", "temporal", [], ["dative"]],
 ["während", "temporal", [], ["dative"]],
 ["seit", "temporal", [], ["dative"]],
-["bis zu", "temporal", [], ["dative"]],
-["nach", "temporal", [], ["dative"]],
+["für", "neutral", [], ["accusative"]],
+["mit", "modal", [], ["dative"]],
 ]

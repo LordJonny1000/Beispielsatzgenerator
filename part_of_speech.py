@@ -80,6 +80,7 @@ class noun:
         self.case = "nominative"
         self.mass_noun = mass_noun
         self.adjective = adjective.from_string("")
+        self.determinative = article("", "", "")
         if self.mass_noun or self.word in(linguistics.nouns_without_plural_form) or self.semantic_class in("location", "event"):
             self.number = "singular"
     @classmethod
@@ -154,7 +155,7 @@ class noun:
                 output = self.lemma + "e"
             elif self.word[-2:] in("ff", "rk", "il") and self.genus == "neutral":
                 output = self.lemma + "e"
-            elif self.word[-3:] == "eid" and self.genus == "neutral":
+            elif self.word[-3:] in (["eid", "orn"]) and self.genus == "neutral":
                 output = self.lemma + "er"
             elif self.word[-2:] in("en") and self.genus == "neutral":
                 output = self.lemma
@@ -187,7 +188,7 @@ class noun:
         return output
     
 class verb:
-    def __init__(self, word, strong_or_weak, valency, object_case, θrolls, movement):
+    def __init__(self, word, strong_or_weak, valency, object_case, θrolls, movement, additional_complement = False, individual_preposition_infos = [None]):
         self.word = word
         self.strong_or_weak = strong_or_weak
         self.valency = valency
@@ -200,10 +201,16 @@ class verb:
             self.lemma = self.word[:-2]
         else:
             self.lemma = self.word[:-1]
+        self.additional_complement = additional_complement
+        self.individual_preposition_infos = individual_preposition_infos
     @classmethod
     def from_list(cls, list_entry):
-        return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5])
-    
+        if len(list_entry) == 6:
+            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5])
+        elif len(list_entry) == 7:
+            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5], list_entry[6])
+        elif len(list_entry) == 8:
+            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4], list_entry[5], list_entry[6], list_entry[7])
     def conjugation(self):
         new_lemma = self.lemma
         for affix in linguistics.detached_affixes:
@@ -247,7 +254,7 @@ class verb:
             else:
                 output = new_lemma + "st"
         elif self.person == "3rd" and self.number == "singular":
-            if new_lemma[-1:] in("n", "t"):
+            if new_lemma[-1] in("n", "t", "d"):
                 output = new_lemma + "et"
             else:
                 output = new_lemma + "t"
@@ -257,7 +264,10 @@ class verb:
                 output = output[:-2] + output[-1]
 
         elif self.person == "2nd" and self.number == "plural":
-            output = new_lemma + "t"
+            if new_lemma[-1] in(["d"]):
+                output = new_lemma + "et"
+            else:
+                output = new_lemma + "t"
         elif self.person == "3rd" and self.number == "plural":
             if new_lemma[-2:] in("er", "el") and new_lemma != "spiel":
                 output = new_lemma + "n"
