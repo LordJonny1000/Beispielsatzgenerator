@@ -223,13 +223,11 @@ def generate_sentence():
 print(generate_sentence())
 
 
-
 #pseudo function for reproducing error
 #x = generate_sentence()
 #while "Achtung, der Artikel konnte nicht gebildet werden!" not in x:
 #   x = generate_sentence()
 #print(x)
-
 
 
 

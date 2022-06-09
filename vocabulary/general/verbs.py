@@ -35,4 +35,5 @@ as_list = [
 ["jagen", "weak", 2, "accusative", ["agent", "patient"], ["stay", "move"]],
 ["zeichnen", "weak", 1, "accusative", ["agent", "patient"], ["stay"], True],
 ["denken", "weak", 1, 0, ["agent"], ["stay"], False, ["an", "anything"]],
+#["warten", "weak", 1, 0, ["agent"], ["stay"], False, ["auf", "anything"]],
 ]

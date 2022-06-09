@@ -57,11 +57,40 @@ def create_compabiliy_matrix(l1, l2):
     for x in l2:
         for y in l1:
             decision = ""
-            while decision == "":
-                decision = input(x + " " + y)
+            while len(decision) != 1:
+                decision = int(input(x + " " + y))
             matrix[counter][word_to_id1[y]] = decision
         counter += 1
     return matrix
+
+def update_compatibility_matrix(rows_list, cols_list, matrix):
+    if type(rows_list[0]) != str:
+        rows_list = [x.word for x in rows_list]
+    if type(cols_list[0]) != str:
+        cols_list = [x.word for x in cols_list]
+    if np.shape(matrix)[0] < len(rows_list):
+        for r in rows_list[-(len(rows_list)-np.shape(matrix)[1]):]:
+            thelist = []
+            for c in cols_list:
+                decision = ""
+                while len(str(decision)) != 1:
+                    decision = input(c + " " + r + " ")
+                thelist.append(int(decision))
+            matrix = np.hstack((matrix, np.array([thelist]).T))
+    elif np.shape(matrix)[1] < len(cols_list):
+        for c in cols_list[-(len(cols_list)-np.shape(matrix)[1]):]:
+            thelist = []
+            for r in rows_list:
+                decision = ""
+                while len(str(decision)) != 1:
+                    decision = input(r + " " + c + " ")
+                thelist.append(int(decision))
+            matrix = np.hstack((matrix, np.array([thelist]).T))
+    else:
+        print("List is already up to date.")
+        
+    return matrix
+
     
 def generate_determinative(noun):
     det = part_of_speech.article(None, None, None)
@@ -97,4 +126,3 @@ def generate_adjective(target):
     adjective = cp(random.choice([part_of_speech.adjective(x) for x in adjectives.as_list]))
     adjective.genus, adjective.case, adjective.number, adjective.article_type = target.genus, target.case, target.number, det.article_type
     return adjective
-

@@ -13,4 +13,5 @@ as_list = [
 ["seit", "temporal", [], ["dative"]],
 ["für", "neutral", [], ["accusative"]],
 ["mit", "modal", [], ["dative"]],
+["bis zu", ["local", "temporal"], [], ["dative"]],
 ]
