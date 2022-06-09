@@ -151,7 +151,7 @@ def generate_sentence():
             individual_noun = cp(random.choice(list_of_verbs))
             individual_noun = part_of_speech.noun(individual_noun.word.capitalize(), "weak", "neutral", "activity")
             individual_noun.number = "singular"
-        individual_noun.case = individual_preposition.case
+        individual_noun.case = individual_preposition.case[0]
         individual_noun.determinative = utils.generate_determinative(individual_noun)
         if random.randrange(4) > 2:
             individual_noun.adjective = utils.generate_adjective(individual_noun)
@@ -226,7 +226,7 @@ print(generate_sentence())
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "ihrem Drache " not in x:
+#while "Achtung, der Artikel konnte nicht gebildet werden!" not in x:
 #   x = generate_sentence()
 #print(x)
 
