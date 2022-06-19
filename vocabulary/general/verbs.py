@@ -2,8 +2,8 @@
 
 as_list = [
 ["gefallen", "strong", 2, "dative", ["patient", "experiencer"], "stay"],
-["schneien", "weak", 0, 0, 0, "stay"],
-["regnen", "weak", 0, 0, 0, "stay", True],
+["schneien", "weak", 0, 0, [None], "stay"],
+["regnen", "weak", 0, 0, [None], "stay", True],
 ["vergessen", "strong", 2, "accusative", ["agent", "patient"], "stay"],
 ["lesen", "strong", 1, 0, ["agent"], "stay", True],
 ["saufen", "strong", 1, 0, ["agent"], "stay", True],
@@ -11,7 +11,7 @@ as_list = [
 ["sehen", "strong", 2, "accusative", ["experiencer", "patient"], "stay"],
 ["vernichten", "weak", 2, "accusative", ["agent", "patient"], "stay"],
 ["wandern", "weak", 1, 0, ["agent"], "move"],
-["auflauern", "weak", 1, 0, ["agent"], "stay", True],
+["auflauern", "weak", 2, "dative", ["agent", "experiencer"], "stay", False],
 ["spielen", "weak", 1, 0, ["agent"], "stay", True],
 ["schlafen", "strong", 1, 0, ["agent"], "stay", False, ["mit", "living_thing"]],
 ["vergeben", "strong", 2, "dative",  ["agent", "experiencer"], "stay", True],
@@ -35,5 +35,8 @@ as_list = [
 ["jagen", "weak", 2, "accusative", ["agent", "patient"], ["stay", "move"]],
 ["zeichnen", "weak", 1, "accusative", ["agent", "patient"], ["stay"], True],
 ["denken", "weak", 1, 0, ["agent"], ["stay"], False, ["an", "anything"]],
-#["warten", "weak", 1, 0, ["agent"], ["stay"], False, ["auf", "anything"]],
+["warten", "weak", 1, 0, ["agent"], ["stay"], False, ["auf", "anything"]],
+["verteidigen", "weak", 2, "accusative", ["agent", "patient"], ["stay"], False, ["vor", "living_thing"]],
+["trainieren", "weak", 1, 0, ["agent"], ["stay"], True],
+["reinigen", "weak", 2, "accusative", ["agent", "patient"], ["stay"], False],
 ]

@@ -4,9 +4,7 @@ import linguistics
 import part_of_speech
 import compatibility_matrices as MX
 from copy import deepcopy as cp
-from vocabulary.general import nouns, adjectives, verbs, prepositions
-from vocabulary.semantic_classes import locations, events
-from vocabulary.proper_names import persons
+from vocabulary.general import nouns, verbs, prepositions
 
 
 def surface(instance):
@@ -22,9 +20,9 @@ def surface(instance):
     return output
     
 def string_to_object(string):#works for open classes only
-    all_words_as_objects = [part_of_speech.noun.from_list(x) for x in nouns.as_list] + [part_of_speech.verb.from_list(x) for x in verbs.as_list] + [part_of_speech.adjective.from_string(x) for x in adjectives.as_list]\
+    all_words_as_objects = [part_of_speech.noun.from_list(x) for x in nouns.as_list] + [part_of_speech.verb.from_list(x) for x in verbs.as_list] + [part_of_speech.adjective(x) for x in open("vocabulary\general\\adjectives.txt", "r", encoding='utf-8').read().splitlines()]\
         + [part_of_speech.preposition.from_list(x) for x in prepositions.as_list] \
-           + [part_of_speech.noun.from_list(x) for x in locations.as_list] + [part_of_speech.noun.from_list(x) for x in events.as_list]
+           + [part_of_speech.noun.from_list(x) for x in nouns.as_list if x[3] == "location"] + [part_of_speech.noun.from_list(x) for x in nouns.as_list if x[3] == "event"]
     matches = [x for x in all_words_as_objects if x.word == string]
     if len(matches) == 0:
         print("Wort >" + string + "< nicht gefunden")
@@ -43,6 +41,10 @@ def list_to_dict(l):
     return word_to_id
 
 def create_compabiliy_matrix(l1, l2):
+    if type(l1[0]) != str:
+        l1 = [x.word for x in l1]
+    if type(l2[0]) != str:
+        l2 = [x.word for x in l2]
     counter = 0
     word_to_id1, word_to_id2 = dict(), dict()
     for x in l1:
@@ -57,8 +59,8 @@ def create_compabiliy_matrix(l1, l2):
     for x in l2:
         for y in l1:
             decision = ""
-            while len(decision) != 1:
-                decision = int(input(x + " " + y))
+            while len(str(decision)) != 1:
+                decision = int(input(x + " " + y + " "))
             matrix[counter][word_to_id1[y]] = decision
         counter += 1
     return matrix
@@ -106,12 +108,12 @@ def generate_determinative(noun):
         det = random.choice(existing_dets)
     elif noun.semantic_class == "location":
         for x in range(len(existing_dets)):
-            if MX.location_to_article_type[x][list_to_dict([x[0] for x in locations.as_list])[noun.word]]:
+            if MX.location_or_event_to_article_type[x][list_to_dict([x[0] for x in nouns.as_list if x[3] in("location", "event")])[noun.word]]:
                 possible_dets.append(existing_dets[x])
         det = random.choice(possible_dets)
     elif noun.semantic_class == "event":
         for x in range(len(existing_dets)):
-            if MX.event_to_article_type[x][list_to_dict([x[0] for x in events.as_list])[noun.word]]:
+            if MX.location_or_event_to_article_type[x][list_to_dict([x[0] for x in nouns.as_list if x[3] in("location", "event")])[noun.word]]:
                 possible_dets.append(existing_dets[x])
         det = random.choice(possible_dets)
     return det
@@ -123,6 +125,9 @@ def generate_adjective(target):
     adjective = part_of_speech.adjective("")
     if target.word == "" or type(target) == part_of_speech.pronoun:
         return adjective
-    adjective = cp(random.choice([part_of_speech.adjective(x) for x in adjectives.as_list]))
+    adjective = cp(random.choice([part_of_speech.adjective(x) for x in open("vocabulary\general\\adjectives.txt", "r", encoding='utf-8').read().splitlines()]))
     adjective.genus, adjective.case, adjective.number, adjective.article_type = target.genus, target.case, target.number, det.article_type
     return adjective
+
+
+

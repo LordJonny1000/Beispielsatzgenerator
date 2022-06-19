@@ -7,8 +7,6 @@ Created on Thu Jan 27 23:39:18 2022
 import random
 import numpy as np
 from vocabulary.general import verbs, prepositions, nouns
-from vocabulary.proper_names import persons
-from vocabulary.semantic_classes import locations, events
 from copy import deepcopy as cp
 import part_of_speech
 import linguistics
@@ -18,20 +16,12 @@ import compatibility_matrices as MX
 
 list_of_nouns = [part_of_speech.noun.from_list(x) for x in nouns.as_list]
 list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.as_list]
-list_of_persons = [part_of_speech.proper_name.from_list(x) for x in persons.as_list]
+list_of_persons = [part_of_speech.proper_name(x[:-2], x[-1]) for x in open("vocabulary\proper_names\persons.txt", "r", encoding='utf-8').read().splitlines()]
 list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.as_list]
-list_of_events = [part_of_speech.noun.from_list(x) for x in events.as_list]
-list_of_locations = [part_of_speech.noun.from_list(x) for x in locations.as_list]
-for x in list_of_events:
-    x.semantic_class = "event"
-for x in list_of_locations:
-    x.semantic_class = "location"
 
 
 
 def generate_sentence(): 
-    
-
     
     #initialize optional tokens
     detached_affix_if_required = ""
@@ -61,7 +51,8 @@ def generate_sentence():
     subject = cp(random.choice([random.choice(list_of_persons), part_of_speech.pronoun("personal", random.choice(linguistics.persons), \
                 random.choice(linguistics.numbers), random.choice(linguistics.genera), None), random.choice([x for x in list_of_nouns if x.semantic_class in("person", "animal", "mythical creature")])]))
     if predicate.valency == 0:
-        subject = part_of_speech.proper_name("es", "neutral")
+        subject = part_of_speech.proper_name("es", "n")
+        subject.genus = "neutral"
     subject.case = "nominative"
     subject.determinative = utils.generate_determinative(subject)
     predicate.person, predicate.number = subject.person, subject.number
@@ -81,7 +72,6 @@ def generate_sentence():
     if probability("object1_adjective"):  
         object1.adjective = utils.generate_adjective(object1)
         
-        
     #generate object2 if valency >= 3
     if predicate.valency >= 3:
         if predicate.θrolls[2] == "patient":
@@ -100,7 +90,7 @@ def generate_sentence():
         possible_events_vec = MX.event_to_temporal_preposition[utils.list_to_dict([x.word for x in list_of_prepositions if "temporal" in x.preposition_type])[event_preposition.word]][:]
         possible_events = []
         counter = 0
-        for e in list_of_events:
+        for e in [x for x in list_of_nouns if x.semantic_class == "event"]:
             if possible_events_vec[counter]:
                 possible_events.append(e)
             counter += 1
@@ -119,7 +109,7 @@ def generate_sentence():
         possible_locations = []
         possible_locations_vec = MX.location_to_local_preposition[utils.list_to_dict([x.word for x in list_of_prepositions if "local" in x.preposition_type])[location_preposition.word]]
         counter = 0
-        for l in list_of_locations:
+        for l in [x for x in list_of_nouns if x.semantic_class == "location"]:
             if possible_locations_vec[counter]:
                 possible_locations.append(l)
             counter += 1
@@ -138,8 +128,7 @@ def generate_sentence():
     local_complement = [location_preposition, location.determinative, location.adjective, location]
     
     #individual complement
-    if predicate.individual_preposition_infos[0] != None:
-        
+    if predicate.individual_preposition_infos[0] != None and random.randrange(2) < 1:
         individual_preposition = utils.string_to_object(predicate.individual_preposition_infos[0])
         if predicate.individual_preposition_infos[1] == "anything":
             individual_noun = cp(random.choice([random.choice(list_of_persons), random.choice(list_of_nouns), part_of_speech.pronoun("reflexive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), individual_preposition.case[0])]))
@@ -148,17 +137,15 @@ def generate_sentence():
         elif predicate.individual_preposition_infos[1] == "person":
             individual_noun = cp(random.choice([random.choice(list_of_persons), random.choice([x for x in list_of_nouns if str(x.semantic_class) in("person")]), part_of_speech.pronoun("reflexive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), individual_preposition.case[0])]))
         elif predicate.individual_preposition_infos[1] == "activity":
-            individual_noun = cp(random.choice(list_of_verbs))
+            individual_noun = cp(random.choice([x for x in list_of_verbs if x.θrolls[0] == "agent"]))
             individual_noun = part_of_speech.noun(individual_noun.word.capitalize(), "weak", "neutral", "activity")
             individual_noun.number = "singular"
+            individual_noun.determinative.article_type = "indefinite"
         individual_noun.case = individual_preposition.case[0]
         individual_noun.determinative = utils.generate_determinative(individual_noun)
         if random.randrange(4) > 2:
             individual_noun.adjective = utils.generate_adjective(individual_noun)
     individual_complement = [individual_preposition, individual_noun.determinative, individual_noun.adjective, individual_noun]
-
-
-            
     
     #initialize sentence
     sentence_list = [subject.determinative, subject.adjective, subject, predicate, object1.determinative, object1.adjective, object1, object2.determinative, object2] \
@@ -225,17 +212,10 @@ print(generate_sentence())
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "Achtung, der Artikel konnte nicht gebildet werden!" not in x:
+#while "reinig" not in x:
 #   x = generate_sentence()
 #print(x)
-
-
-
-
-
-
-
-
+    
 
 
 

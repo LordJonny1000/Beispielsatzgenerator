@@ -15,4 +15,4 @@ accusative_with_en = ["Hase","Bruchpilot", "Drache"]
 nouns_without_plural_form = ["Abendessen"]
 contraction_words = {"an dem":"am", "bei dem":"beim", "in dem":"im", "von dem":"vom", "zu dem":"zum", "an das":"ans", "in das":"ins", "zu der":"zur"}
 interrogative_words = ["warum", "weshalb", "wieso", "wann", "wo", "wer", "was", "wie"]
-
+#semantic classes for nouns so far: person, animal, mythical creature, event, location, acitvity

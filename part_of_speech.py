@@ -120,26 +120,19 @@ class noun:
                     list_for_transformation = list(self.lemma)
                     list_for_transformation[self.lemma.index("o")] = 'ö'
                     self.lemma = ''.join(list_for_transformation) 
-                    
-            if self.word[-3:] in("ent", "and", "ant", "ist") and self.genus == "masculine":
-                output = self.lemma + "en"
-            elif  self.word[-1:] == "e" and self.genus == "masculine":
+               
+            output = self.word + "s"
+            if  self.word[-1:] == "e" and self.genus == "masculine":
                 output = self.lemma + "n"
-            elif self.word[-2:] in("or", "ot",) and self.genus == "masculine":
-                output = self.lemma + "en"
             elif self.word[-1:] == "e" and self.genus == "feminine":
                 output = self.lemma + "n"
-            elif  self.word[-2:] in("ik", "in", "el") and self.genus == "feminine":
+            if self.word[-2:] in("or", "ot",) and self.genus == "masculine":
+                output = self.lemma + "en"
+            elif  self.word[-2:] in("ik", "in", "el", "st") and self.genus == "feminine":
                 if self.word[-2:] == "el":
                     output = self.lemma + "n"
                 else:
-                    output = self.lemma + "e"    
-            elif  self.word[-4:] in("heit", "keit") and self.genus == "feminine":
-                output = self.lemma + "en"
-            elif  self.word[-3:] in("ion", "tät","ung") and self.genus == "feminine":
-                output = self.lemma + "en"
-            elif  self.word[-6:] == "schaft" and self.genus == "feminine":
-                output = self.lemma + "en"
+                    output = self.lemma + "e"
             elif  self.word[-2:] in("ma", "um", "us"):
                 if self.word[-2:] == "ma":
                     output = self.lemma[:-1] + "en"
@@ -147,25 +140,31 @@ class noun:
                     output = self.lemma + "e"
                 else: 
                     output = self.lemma + "en"
-            elif self.word[-4:] == "ling" and self.genus == "masculine":
+            elif self.word[-2:] in("ig", "ör", "al", "äl", "st") and self.genus == "masculine":
                 output = self.lemma + "e"
-            elif self.word[-3:] in("eur","ich", "ier", "uhl", "ehl", "rzt", "hof") and self.genus == "masculine":
-                output = self.lemma + "e"
-            elif self.word[-2:] in("ig", "ör", "al", "äl") and self.genus == "masculine":
-                output = self.lemma + "e"
-            elif self.word[-2:] in("ff", "rk", "il") and self.genus == "neutral":
-                output = self.lemma + "e"
-            elif self.word[-3:] in (["eid", "orn"]) and self.genus == "neutral":
-                output = self.lemma + "er"
             elif self.word[-2:] in("en") and self.genus == "neutral":
                 output = self.lemma
-            #independent of genus
+            elif self.word[-2:] in("ff", "rk", "il") and self.genus == "neutral":
+                output = self.lemma + "e"
             elif self.word[-2:] in("er", "el"):
                 output = self.lemma
-            elif self.word[-2:] == "st":
+            if self.word[-3:] in("ent", "and", "ant", "ist") and self.genus == "masculine":
+                output = self.lemma + "en"
+            elif  self.word[-3:] in("ion", "tät","ung") and self.genus == "feminine":
+                output = self.lemma + "en"
+            elif self.word[-3:] in("eur","ich", "ier", "uhl", "ehl", "rzt", "hof") and self.genus == "masculine":
                 output = self.lemma + "e"
-            else: 
-                output = self.lemma + "s"
+            elif self.word[-3:] in (["eid", "orn"]) and self.genus in ("neutral"):
+                output = self.lemma + "er"
+            if  self.word[-4:] in("heit", "keit") and self.genus == "feminine":
+                output = self.lemma + "en"
+            elif self.word[-4:] == "ling" and self.genus == "masculine":
+                output = self.lemma + "e"
+            elif self.word[-4:] == "eist" and self.genus == "masculine":
+                output = self.lemma + "er"
+            if  self.word[-6:] == "schaft" and self.genus == "feminine":
+                output = self.lemma + "en"
+                
         if self.case == "dative":
             if self.number == "plural":
                 if output[-1] == "e":
@@ -281,17 +280,17 @@ class verb:
           
 class proper_name:
 
-    def __init__(self, word, genus):
+    def __init__(self, word, genus_short):
         self.word = word
-        self.genus = genus
         self.person = "3rd"
         self.number = "singular"
         self.adjective = adjective.from_string("")
         self.semantic_class = "proper_name"
         self.mass_noun = False
-    @classmethod
-    def from_list(cls, list_entry):
-        return cls(list_entry[0], list_entry[1])
+        if genus_short == "m":
+            self.genus = "masculine"
+        elif genus_short == "f":
+            self.genus = "feminine"
     def declension(self):
         return self.word
  
