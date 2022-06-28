@@ -4,6 +4,7 @@ Created on Thu Jan 27 23:39:18 2022
 
 @author: jonny
 """
+
 import random
 import numpy as np
 from vocabulary.general import verbs, prepositions, nouns
@@ -20,19 +21,33 @@ list_of_persons = [part_of_speech.proper_name(x[:-2], x[-1]) for x in open("voca
 list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.as_list]
 
 
-
 def generate_sentence(): 
     
-    #initialize optional tokens
-    detached_affix_if_required = ""
-    object1 = part_of_speech.noun("", "", "", "")
-    object2 = part_of_speech.noun("", "", "", "")
-    event = part_of_speech.noun("", "", "", "")
-    event_preposition = part_of_speech.preposition("", "", "", "")
-    location = part_of_speech.noun("", "", "", "")
-    location_preposition = part_of_speech.preposition("", "", "", "")
-    individual_noun = part_of_speech.noun("", "", "", "")
-    individual_preposition = part_of_speech.preposition("", "", "", "")
+    #initialize tokens
+
+    interrogative_word = part_of_speech.proper_name('EMPTY', "neutral")
+    subject = part_of_speech.proper_name('EMPTY', "neutral")
+    subject.determinative = part_of_speech.proper_name('EMPTY', "neutral")
+    subject.adjective = part_of_speech.proper_name('EMPTY', "neutral")
+    predicate = part_of_speech.proper_name('EMPTY', "neutral")
+    object1 = part_of_speech.proper_name('EMPTY', "neutral")
+    object1.determinative = part_of_speech.proper_name('EMPTY', "neutral")
+    object1.adjective = part_of_speech.proper_name('EMPTY', "neutral")
+    object2 = part_of_speech.proper_name('EMPTY', "neutral")
+    object2.determinative = part_of_speech.proper_name('EMPTY', "neutral")
+    event = part_of_speech.proper_name('EMPTY', "neutral")
+    event_preposition = part_of_speech.proper_name('EMPTY', "neutral")
+    event.determinative = part_of_speech.proper_name('EMPTY', "neutral")
+    event.adjective = part_of_speech.proper_name('EMPTY', "neutral")
+    location = part_of_speech.proper_name('EMPTY', "neutral")
+    location_preposition = part_of_speech.proper_name('EMPTY', "neutral")
+    location.determinative = part_of_speech.proper_name('EMPTY', "neutral")
+    location.adjective = part_of_speech.proper_name('EMPTY', "neutral")
+    individual_preposition = part_of_speech.proper_name('EMPTY', "neutral")
+    individual_noun = part_of_speech.proper_name('EMPTY', "neutral")
+    individual_noun.determinative = part_of_speech.proper_name('EMPTY', "neutral")
+    individual_noun.adjective = part_of_speech.proper_name('EMPTY', "neutral")
+    detached_affix_if_required = part_of_speech.proper_name('EMPTY', "neutral")
     
     #set sentence mode
     x = probability("interrogative_clause")
@@ -44,7 +59,7 @@ def generate_sentence():
     predicate = cp(random.choice(list_of_verbs))
     for affix in linguistics.detached_affixes:
         if predicate.lemma[:len(affix)] == affix:
-            detached_affix_if_required = affix
+            detached_affix_if_required =  part_of_speech.proper_name(affix, "neutral")
             break
 
     #generate subject
@@ -101,7 +116,7 @@ def generate_sentence():
         #generate event adjective
         if probability("event_adjective"):
             event.adjective = utils.generate_adjective(event)
-    temporal_complement = [event_preposition, event.determinative, event.adjective, event]
+    
 
     #generate local complement
     if probability("local_complement"):
@@ -125,7 +140,6 @@ def generate_sentence():
         #generate location adjective
         if probability("location_adjective"):
             location.adjective = utils.generate_adjective(location)
-    local_complement = [location_preposition, location.determinative, location.adjective, location]
     
     #individual complement
     if predicate.individual_preposition_infos[0] != None and random.randrange(2) < 1:
@@ -145,11 +159,16 @@ def generate_sentence():
         individual_noun.determinative = utils.generate_determinative(individual_noun)
         if random.randrange(4) > 2:
             individual_noun.adjective = utils.generate_adjective(individual_noun)
+    
+    #grouped complements
+    local_complement = [location_preposition, location.determinative, location.adjective, location]
     individual_complement = [individual_preposition, individual_noun.determinative, individual_noun.adjective, individual_noun]
+    temporal_complement = [event_preposition, event.determinative, event.adjective, event]
     
     #initialize sentence
-    sentence_list = [subject.determinative, subject.adjective, subject, predicate, object1.determinative, object1.adjective, object1, object2.determinative, object2] \
-                    + temporal_complement + local_complement + individual_complement + [detached_affix_if_required]
+    sentence_list = [subject.determinative, subject.adjective, subject, predicate, object1.determinative, object1.adjective, object1, object2.determinative, object2, \
+                    event_preposition, event.determinative, event.adjective, event, location_preposition, location.determinative, location.adjective, location, \
+                        individual_preposition, individual_noun.determinative, individual_noun.adjective, individual_noun, detached_affix_if_required]
 
     #adjust word order:
     if object2:
@@ -165,7 +184,7 @@ def generate_sentence():
             interrogative_words = cp(linguistics.interrogative_words)
             if  predicate.valency < 2:
                 interrogative_words.remove("was")
-            interrogative_word = random.choice([x for x in interrogative_words])
+            interrogative_word.word = random.choice([x for x in interrogative_words])
             if interrogative_word == "wer":
               sentence_list.remove(subject.determinative), sentence_list.remove(subject.adjective), sentence_list.remove(subject)
               predicate.person, predicate.number = "3rd", "singular"
@@ -180,10 +199,10 @@ def generate_sentence():
                 sentence_list.remove(location.determinative), sentence_list.remove(location.adjective), sentence_list.remove(location)
             elif interrogative_word == "wann":
                sentence_list.remove(event.determinative), sentence_list.remove(event.adjective),  sentence_list.remove(event)
-            sentence_list = [interrogative_word] + sentence_list
-            
+    sentence_list = [interrogative_word] + sentence_list
+    
     #surface transformation
-    output = " ".join([utils.surface(x) for x in sentence_list if len(utils.surface(x)) > 0])
+    output = " ".join([utils.surface(x) for x in sentence_list if len(x.word) > 0 and x.word != "EMPTY"])
     
     #contraction               
     counter = 0
@@ -199,12 +218,10 @@ def generate_sentence():
         occuring_contraction_words.remove(thechoice)
         output = output.replace(" " + thechoice + " ", " " + linguistics.contraction_words[thechoice] + " ")
     del contracnum, counter, occuring_contraction_words             
-    
-    #finish          
-    while output[-1] in(" ", ","):
-        output = output[:-1]
-    output = output[0].upper() + output[1:] + closing_punctuation_mark
 
+    #finish
+    output = output[0].upper() + output[1:] + closing_punctuation_mark
+    
     return output
 
 print(generate_sentence())
@@ -212,13 +229,16 @@ print(generate_sentence())
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "reinig" not in x:
+#while ",." not in x:
 #   x = generate_sentence()
-#print(x)
+#(x)
     
 
 
-
+#important combinations: subject.wordXpredicate.word, subject.wordXsubject_determinative.article_type, subject.wordXsubject_adjective.word
+    #                        predicate.wordXobject1.word, predicate.wordXobject1.number, predicate.wordXobject1_adjective.word, predicate.wordXobject1_determinative.article_type
+    #                        predicate.wordXobject2.word, predicate.wordXobject2.number, predicate.wordXobject2_adjective.word, predicate.wordXobject2_determinative.article_type
+    #                        event.wordXevent_preposition.word, event.wordXevent_adjective.word, location.wordXlocation_preposition.word, location.wordXlocation_adjective.word, 
 
 
 

@@ -16,7 +16,7 @@ def surface(instance):
     elif type(instance) in(part_of_speech.article, part_of_speech.pronoun, part_of_speech.proper_name, part_of_speech.preposition):
         output = instance.word
     elif type(instance) == str:
-        output = instance
+        return instance
     return output
     
 def string_to_object(string):#works for open classes only
@@ -95,6 +95,8 @@ def update_compatibility_matrix(rows_list, cols_list, matrix):
 
     
 def generate_determinative(noun):
+    if noun.word == "EMPTY":
+        return part_of_speech.proper_name('EMPTY', "neutral")
     det = part_of_speech.article(None, None, None)
     existing_dets = [part_of_speech.article("definite", noun.number, noun.genus, noun.case), part_of_speech.article("indefinite", noun.number, noun.genus, noun.case),\
                      part_of_speech.pronoun("possesive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera),\
@@ -119,6 +121,8 @@ def generate_determinative(noun):
     return det
 
 def generate_adjective(target):
+    if target.word == "EMPTY":
+        return part_of_speech.proper_name('EMPTY', "neutral")
     if type(target) == part_of_speech.proper_name:
         target.determinative = part_of_speech.article("definite", "singular", target.genus, target.case)
     det = target.determinative

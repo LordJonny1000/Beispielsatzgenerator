@@ -280,16 +280,17 @@ class verb:
           
 class proper_name:
 
-    def __init__(self, word, genus_short):
+    def __init__(self, word, genus):
         self.word = word
         self.person = "3rd"
         self.number = "singular"
         self.adjective = adjective.from_string("")
         self.semantic_class = "proper_name"
         self.mass_noun = False
-        if genus_short == "m":
+        self.genus = genus
+        if self.genus == "m":
             self.genus = "masculine"
-        elif genus_short == "f":
+        elif self.genus == "f":
             self.genus = "feminine"
     def declension(self):
         return self.word
