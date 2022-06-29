@@ -521,10 +521,8 @@ class article:
                         output = "ein"
                 if number == "plural":
                     output = ""
-        else:
+        if "output" not in locals():
             output = "Achtung, der Artikel konnte nicht gebildet werden!"
-        try: 
-            self.word = output
-        except NameError:
-            self.word = ""
+        self.word = output
+
 

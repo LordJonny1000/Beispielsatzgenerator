@@ -13,8 +13,7 @@ import part_of_speech
 import linguistics
 import utils
 from probability_settings import probability
-import compatibility_matrices as MX
-from nltk.tokenize import word_tokenize
+
 
 list_of_nouns = [part_of_speech.noun.from_list(x) for x in nouns.as_list]
 list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.as_list]
@@ -67,8 +66,7 @@ def generate_sentence():
     subject = cp(random.choice([random.choice(list_of_persons), part_of_speech.pronoun("personal", random.choice(linguistics.persons), \
                 random.choice(linguistics.numbers), random.choice(linguistics.genera), None), random.choice([x for x in list_of_nouns if x.semantic_class in("person", "animal", "mythical creature")])]))
     if predicate.valency == 0:
-        subject = part_of_speech.proper_name("es", "n")
-        subject.genus = "neutral"
+        subject = part_of_speech.proper_name("es", "neutral")
     subject.case = "nominative"
     subject.determinative = utils.generate_determinative(subject)
     predicate.person, predicate.number = subject.person, subject.number
@@ -102,15 +100,8 @@ def generate_sentence():
 
     #generate temporal complement
     if probability("temporal_complement"):
-        event_preposition = cp(random.choice([x for x in list_of_prepositions if "temporal" in (x.preposition_type)]))
-        possible_events_vec = MX.event_to_temporal_preposition[utils.list_to_dict([x.word for x in list_of_prepositions if "temporal" in x.preposition_type])[event_preposition.word]][:]
-        possible_events = []
-        counter = 0
-        for e in [x for x in list_of_nouns if x.semantic_class == "event"]:
-            if possible_events_vec[counter]:
-                possible_events.append(e)
-            counter += 1
-        event = random.choice(possible_events)
+        event_preposition = cp(random.choice([x for x in list_of_prepositions if "temporal" in(x.preposition_type)]))
+        event = cp(random.choice([x for x in list_of_nouns if x.semantic_class == "event"]))
         event.number = "singular"
         event.case = "dative"
         event.determinative = utils.generate_determinative(event)
@@ -122,17 +113,8 @@ def generate_sentence():
     #generate local complement
     if probability("local_complement"):
         location_preposition = cp(random.choice([x for x in list_of_prepositions if "local" in (x.preposition_type) and predicate.movement in x.movement_modes]))
-        possible_locations = []
-        possible_locations_vec = MX.location_to_local_preposition[utils.list_to_dict([x.word for x in list_of_prepositions if "local" in x.preposition_type])[location_preposition.word]]
-        counter = 0
-        for l in [x for x in list_of_nouns if x.semantic_class == "location"]:
-            if possible_locations_vec[counter]:
-                possible_locations.append(l)
-            counter += 1
-        location = random.choice(possible_locations)
-        location.number = "singular"
-        location.case = location_preposition.case
-        location.determinative = utils.generate_determinative(location)
+        location = cp(random.choice([x for x in list_of_nouns if x.semantic_class == "location"]))
+        location.number, location.case, location.determinative = "singular", location_preposition.case, utils.generate_determinative(location)
         if predicate.movement == "stay":
             location.case = "dative"
         else:
@@ -236,29 +218,16 @@ def generate_sentence():
     output = output[0].upper() + output[1:] + closing_punctuation_mark
     return output, list(features.values()), vars(object1)
 
-#print(generate_sentence()[0])
+print(generate_sentence()[0])
 
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "gefällt Geist" not in x[0]:
+#while "Ein es" not in x[0]:
 #   x = generate_sentence()
 #print(x)
     
-def create_training_data():
-    for x in range(100):
-        with open("training data\clear_sentences.txt", "a", encoding='utf-8') as cTXT:
-            sent = generate_sentence()
-            features = sent[1]
-            sent = sent[0]
-            label = ""
-            while label != "0" and label != "1":
-                label = input(sent + " Label:")
-            cTXT.write(sent + " " + str(bool(int(label))) + "\n")
-        with open("training data\\feature_sentences.txt", "a", encoding='utf-8') as fTXT:
-            for f in features:
-                fTXT.write(str(f) + " ")
-            fTXT.write(str(bool(int(label))) + "\n")
+
             
 
 
@@ -269,34 +238,9 @@ def create_training_data():
 #location.wordXlocation_adjective.word, individual_noun.wordXindividual_noun.determinative.article_type, individual_noun.wordXindividual_noun.adjective.word, 
 #individual_noun.wordXindividual_noun.number
 
-#create_training_data()
 
 
-def create_occuring_surface_tokens():
-    tokens = set()
-    for x in range(100000):
-        print(str(x)+"/100000")
-        for y in word_tokenize(generate_sentence()[0], "german"):
-            tokens.add(y)
-    with open("occuring_surface_tokens.txt", "a", encoding='utf-8') as f:
-        for x in sorted(tokens):
-            f.write((x.lower()) + "\n")
-            
-def create_synthetic_sentence(sentence):
-    with open("occuring_surface_tokens.txt", "r", encoding='utf-8') as of:
-        o = of.read().splitlines()
-        unknown_words = list()
-        for t in word_tokenize(sentence, "german"):
-            if t.lower() not in o:
-                unknown_words.append(t)
-        if len(unknown_words) == 0:
-            with open("training data\synthetic_sentences.txt", "a", encoding='utf-8') as sy:
-                sy.write(sentence + " True")
-                print("done")
-        else:
-            print("unknown_words", unknown_words)
-        
-create_synthetic_sentence("Der verpeilte Hase vergibt dem grenzdebilen Bruchpiloten.")
+
 
     
 
