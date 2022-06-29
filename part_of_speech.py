@@ -263,7 +263,7 @@ class verb:
                 output = output[:-2] + output[-1]
 
         elif self.person == "2nd" and self.number == "plural":
-            if new_lemma[-1] in(["d"]):
+            if new_lemma[-1] in(["d", "t"]):
                 output = new_lemma + "et"
             else:
                 output = new_lemma + "t"
@@ -284,14 +284,19 @@ class proper_name:
         self.word = word
         self.person = "3rd"
         self.number = "singular"
-        self.adjective = adjective.from_string("")
-        self.semantic_class = "proper_name"
+        self.adjective = adjective.from_string("EMPTY")
+        self.semantic_class = "person"
         self.mass_noun = False
         self.genus = genus
         if self.genus == "m":
             self.genus = "masculine"
         elif self.genus == "f":
             self.genus = "feminine"
+        #for use as empty token
+        if self.word == "EMPTY":
+            self.article_type = None
+            self.person = None
+            self.number = None
     def declension(self):
         return self.word
  
@@ -316,7 +321,7 @@ class pronoun:
             self.noun_genus = noun_genus
             self.semantic_class = None
             self.mass_noun = False
-            self.adjective = adjective.from_string("")
+            self.adjective = adjective.from_string("EMPTY")
             if self.pronoun_type == "personal":
                 if self.number == "singular":
                     if self.person == "1st":

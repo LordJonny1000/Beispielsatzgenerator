@@ -122,11 +122,11 @@ def generate_determinative(noun):
 
 def generate_adjective(target):
     if target.word == "EMPTY":
-        return part_of_speech.proper_name('EMPTY', "neutral")
+        return part_of_speech.adjective("EMPTY")
     if type(target) == part_of_speech.proper_name:
         target.determinative = part_of_speech.article("definite", "singular", target.genus, target.case)
     det = target.determinative
-    adjective = part_of_speech.adjective("")
+    adjective = part_of_speech.adjective("EMPTY")
     if target.word == "" or type(target) == part_of_speech.pronoun:
         return adjective
     adjective = cp(random.choice([part_of_speech.adjective(x) for x in open("vocabulary\general\\adjectives.txt", "r", encoding='utf-8').read().splitlines()]))

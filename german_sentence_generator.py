@@ -166,9 +166,16 @@ def generate_sentence():
     temporal_complement = [event_preposition, event.determinative, event.adjective, event]
     
     #initialize sentence
-    sentence_list = [subject.determinative, subject.adjective, subject, predicate, object1.determinative, object1.adjective, object1, object2.determinative, object2, \
-                    event_preposition, event.determinative, event.adjective, event, location_preposition, location.determinative, location.adjective, location, \
-                        individual_preposition, individual_noun.determinative, individual_noun.adjective, individual_noun, detached_affix_if_required]
+    sentence_list = [subject.determinative, subject.adjective, subject, predicate, object1.determinative, object1.adjective, object1, object2.determinative, \
+                    object2, event_preposition, event.determinative, event.adjective, event, location_preposition, location.determinative, location.adjective, location, \
+                    individual_preposition, individual_noun.determinative, individual_noun.adjective, individual_noun, detached_affix_if_required]
+        
+    features = [subject.determinative.article_type, subject.adjective.word, subject.word, subject.number, subject.semantic_class, predicate.word, object1.determinative.article_type,\
+                object1.adjective.word, object1.word, object1.number, object1.semantic_class, object2.determinative.article_type, object2.word, object2.number,\
+                object2.semantic_class, event_preposition.word, event.determinative.article_type, event.adjective.word, event.word, location_preposition.word, \
+                location.determinative.article_type, location.adjective.word, location.word, individual_preposition.word,  individual_noun.determinative.article_type,\
+                individual_noun.adjective.word, individual_noun.word, individual_noun.number, individual_noun.semantic_class]
+    #ADD IS SEN INERROGATIVE?
 
     #adjust word order:
     if object2:
@@ -184,21 +191,22 @@ def generate_sentence():
             interrogative_words = cp(linguistics.interrogative_words)
             if  predicate.valency < 2:
                 interrogative_words.remove("was")
-            interrogative_word.word = random.choice([x for x in interrogative_words])
+            interrogative_word = random.choice(interrogative_words)
             if interrogative_word == "wer":
-              sentence_list.remove(subject.determinative), sentence_list.remove(subject.adjective), sentence_list.remove(subject)
-              predicate.person, predicate.number = "3rd", "singular"
+                sentence_list.remove(subject.determinative), sentence_list.remove(subject.adjective), sentence_list.remove(subject)
+                predicate.person, predicate.number = "3rd", "singular"
             if random.randrange(2) < 1:
-              if interrogative_word == "was":
+                if interrogative_word == "was":
                   if predicate.object_case == "dative":
                       interrogative_word = "wem"
                   elif predicate.object_case == "accusative":
                       interrogative_word = "wen"
                   sentence_list.remove(object1.determinative), sentence_list.remove(object1.adjective), sentence_list.remove(object1)
             elif interrogative_word == "wo":
-                sentence_list.remove(location.determinative), sentence_list.remove(location.adjective), sentence_list.remove(location)
+                sentence_list.remove(location_preposition), sentence_list.remove(location.determinative), sentence_list.remove(location.adjective), sentence_list.remove(location)
             elif interrogative_word == "wann":
-               sentence_list.remove(event.determinative), sentence_list.remove(event.adjective),  sentence_list.remove(event)
+               sentence_list.remove(event_preposition), sentence_list.remove(event.determinative), sentence_list.remove(event.adjective),  sentence_list.remove(event)
+            interrogative_word = part_of_speech.proper_name(interrogative_word, None)
     sentence_list = [interrogative_word] + sentence_list
     
     #surface transformation
@@ -229,16 +237,12 @@ print(generate_sentence())
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while ",." not in x:
+#while "vernichtt" not in x[0]:
 #   x = generate_sentence()
-#(x)
+#print(x)
     
 
 
-#important combinations: subject.wordXpredicate.word, subject.wordXsubject_determinative.article_type, subject.wordXsubject_adjective.word
-    #                        predicate.wordXobject1.word, predicate.wordXobject1.number, predicate.wordXobject1_adjective.word, predicate.wordXobject1_determinative.article_type
-    #                        predicate.wordXobject2.word, predicate.wordXobject2.number, predicate.wordXobject2_adjective.word, predicate.wordXobject2_determinative.article_type
-    #                        event.wordXevent_preposition.word, event.wordXevent_adjective.word, location.wordXlocation_preposition.word, location.wordXlocation_adjective.word, 
 
 
 

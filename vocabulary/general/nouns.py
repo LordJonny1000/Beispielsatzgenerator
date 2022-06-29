@@ -35,7 +35,7 @@ as_list = [
 ["Leiche", "weak", "feminine", None],
 ["Triebwerk", "weak", "neutral", None],
 ["Sauerkraut", "weak", "neutral", None, True],
-["Schmierseife", "weak", "neutral", None, True],
+["Schmierseife", "weak", "feminine", None, True],
 ["Kokain", "weak", "neutral", None, True],
 ["Bier", "weak", "neutral", None, True],
 ["Geist", "weak", "masculine", "mythical creature"],
