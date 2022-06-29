@@ -169,7 +169,7 @@ class noun:
             if self.number == "plural":
                 if output[-1] == "e":
                     output = output + "n"
-                if output[-2:] == "el":
+                if output[-2:] in("el", "er"):
                     output = output + "n"
                 if output[-3:] == "ent":
                     output = output + "en"
@@ -297,6 +297,7 @@ class proper_name:
             self.article_type = None
             self.person = None
             self.number = None
+            self.semantic_class = None
     def declension(self):
         return self.word
  

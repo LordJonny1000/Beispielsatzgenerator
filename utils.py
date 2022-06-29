@@ -7,6 +7,7 @@ from copy import deepcopy as cp
 from vocabulary.general import nouns, verbs, prepositions
 
 
+
 def surface(instance):
 
     if type(instance) in([part_of_speech.noun, part_of_speech.adjective]):

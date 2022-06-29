@@ -14,6 +14,7 @@ import linguistics
 import utils
 from probability_settings import probability
 import compatibility_matrices as MX
+from nltk.tokenize import word_tokenize
 
 list_of_nouns = [part_of_speech.noun.from_list(x) for x in nouns.as_list]
 list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.as_list]
@@ -155,7 +156,7 @@ def generate_sentence():
             individual_noun = part_of_speech.noun(individual_noun.word.capitalize(), "weak", "neutral", "activity")
             individual_noun.number = "singular"
             individual_noun.determinative.article_type = "indefinite"
-        individual_noun.case = individual_preposition.case[0]
+        individual_noun.case = predicate.individual_preposition_infos[2]
         individual_noun.determinative = utils.generate_determinative(individual_noun)
         if random.randrange(4) > 2:
             individual_noun.adjective = utils.generate_adjective(individual_noun)
@@ -170,13 +171,6 @@ def generate_sentence():
                     object2, event_preposition, event.determinative, event.adjective, event, location_preposition, location.determinative, location.adjective, location, \
                     individual_preposition, individual_noun.determinative, individual_noun.adjective, individual_noun, detached_affix_if_required]
         
-    features = [subject.determinative.article_type, subject.adjective.word, subject.word, subject.number, subject.semantic_class, predicate.word, object1.determinative.article_type,\
-                object1.adjective.word, object1.word, object1.number, object1.semantic_class, object2.determinative.article_type, object2.word, object2.number,\
-                object2.semantic_class, event_preposition.word, event.determinative.article_type, event.adjective.word, event.word, location_preposition.word, \
-                location.determinative.article_type, location.adjective.word, location.word, individual_preposition.word,  individual_noun.determinative.article_type,\
-                individual_noun.adjective.word, individual_noun.word, individual_noun.number, individual_noun.semantic_class]
-    #ADD IS SEN INERROGATIVE?
-
     #adjust word order:
     if object2:
         if type(object2) == part_of_speech.pronoun:
@@ -209,6 +203,17 @@ def generate_sentence():
             interrogative_word = part_of_speech.proper_name(interrogative_word, None)
     sentence_list = [interrogative_word] + sentence_list
     
+    features = {"interrogative_word":interrogative_word, "sentence_mode":sentence_mode, "subject.determinative.article_type":subject.determinative.article_type, "subject.adjective.word":subject.adjective.word,\
+                "subject.word":subject.word, "subject.number":subject.number, "predicate.word":predicate.word, "object1.determinative.article_type":object1.determinative.article_type,\
+                "object1.adjective.word":object1.adjective.word, "object1.word":object1.word, "object1.number":object1.number, \
+                "object2.determinative.article_type":object2.determinative.article_type, \
+                "object2.word":object2.word, "object2.number":object2.number, "event_preposition.word":event_preposition.word,\
+                "event.determinative.article_type":event.determinative.article_type, "event.adjective.word":event.adjective.word, "event.word":event.word, \
+                "location_preposition.word":location_preposition.word, "location.determinative.article_type":location.determinative.article_type, \
+                "location.adjective.word":location.adjective.word, "location.word":location.word, "individual_preposition.word":individual_preposition.word,\
+                "individual_noun.determinative.article_type":individual_noun.determinative.article_type, "individual_noun.adjective.word":individual_noun.adjective.word,\
+                "individual_noun.word":individual_noun.word, "individual_noun.number":individual_noun.number}
+    
     #surface transformation
     output = " ".join([utils.surface(x) for x in sentence_list if len(x.word) > 0 and x.word != "EMPTY"])
     
@@ -229,24 +234,71 @@ def generate_sentence():
 
     #finish
     output = output[0].upper() + output[1:] + closing_punctuation_mark
-    
-    return output
+    return output, list(features.values()), vars(object1)
 
-print(generate_sentence())
+#print(generate_sentence()[0])
 
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "vernichtt" not in x[0]:
+#while "gefällt Geist" not in x[0]:
 #   x = generate_sentence()
 #print(x)
     
+def create_training_data():
+    for x in range(100):
+        with open("training data\clear_sentences.txt", "a", encoding='utf-8') as cTXT:
+            sent = generate_sentence()
+            features = sent[1]
+            sent = sent[0]
+            label = ""
+            while label != "0" and label != "1":
+                label = input(sent + " Label:")
+            cTXT.write(sent + " " + str(bool(int(label))) + "\n")
+        with open("training data\\feature_sentences.txt", "a", encoding='utf-8') as fTXT:
+            for f in features:
+                fTXT.write(str(f) + " ")
+            fTXT.write(str(bool(int(label))) + "\n")
+            
 
 
+#subject.wordXpredicate.word, subject.wordXsubject_determinative.article_type, subject.wordXsubject_adjective.word
+#predicate.wordXobject1.word, predicate.wordXobject1.number, predicate.wordXobject1_adjective.word, predicate.wordXobject1_determinative.article_type
+#predicate.wordXobject2.word, predicate.wordXobject2.number, predicate.wordXobject2_adjective.word, predicate.wordXobject2_determinative.article_type
+#event.wordXevent_preposition.word, event.wordXevent_adjective.word, predicate.wordXlocation.wordXlocation_preposition.word, location.wordXlocation_preposition.word,
+#location.wordXlocation_adjective.word, individual_noun.wordXindividual_noun.determinative.article_type, individual_noun.wordXindividual_noun.adjective.word, 
+#individual_noun.wordXindividual_noun.number
+
+#create_training_data()
 
 
+def create_occuring_surface_tokens():
+    tokens = set()
+    for x in range(100000):
+        print(str(x)+"/100000")
+        for y in word_tokenize(generate_sentence()[0], "german"):
+            tokens.add(y)
+    with open("occuring_surface_tokens.txt", "a", encoding='utf-8') as f:
+        for x in sorted(tokens):
+            f.write((x.lower()) + "\n")
+            
+def create_synthetic_sentence(sentence):
+    with open("occuring_surface_tokens.txt", "r", encoding='utf-8') as of:
+        o = of.read().splitlines()
+        unknown_words = list()
+        for t in word_tokenize(sentence, "german"):
+            if t.lower() not in o:
+                unknown_words.append(t)
+        if len(unknown_words) == 0:
+            with open("training data\synthetic_sentences.txt", "a", encoding='utf-8') as sy:
+                sy.write(sentence + " True")
+                print("done")
+        else:
+            print("unknown_words", unknown_words)
+        
+create_synthetic_sentence("Der verpeilte Hase vergibt dem grenzdebilen Bruchpiloten.")
 
-
+    
 
 
 
