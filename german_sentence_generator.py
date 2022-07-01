@@ -7,7 +7,6 @@ Created on Thu Jan 27 23:39:18 2022
 
 import random
 import numpy as np
-from vocabulary.general import verbs, prepositions
 from copy import deepcopy as cp
 import part_of_speech
 import linguistics
@@ -22,17 +21,25 @@ with open("vocabulary/general/nouns.json", encoding="utf8") as sf:
     list_of_nouns = list()
     for x in sd:
         list_of_nouns.append(part_of_speech.noun(x["word"], x["strong_or_weak"], x["genus"], x["semantic_class"], x["mass_noun"]))
+with open("vocabulary/general/verbs.json", encoding="utf8") as sf:
+    sd = json.load(sf)
+    list_of_verbs = list()
+    for x in sd:
+        x["θrolls"] = x["θ\u200brolls"]
+        del x["θ\u200brolls"]
+        list_of_verbs.append(part_of_speech.verb(x["word"], x["strong_or_weak"], x["valency"], x["object_case"], x["θrolls"], x["movement"], x["additional_complement"], x["individual_preposition_infos"]))
+with open("vocabulary/general/prepositions.json", encoding="utf8") as sf:
+    sd = json.load(sf)
+    list_of_prepositions = list()
+    for x in sd:
+        list_of_prepositions.append(part_of_speech.preposition(x["word"], x["preposition_type"], x["movement_modes"], x["case"]))
 
-
-list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.as_list]
 list_of_persons = [part_of_speech.proper_name(x[:-2], x[-1]) for x in open("vocabulary\proper_names\persons.txt", "r", encoding='utf-8').read().splitlines()]
-list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.as_list]
 
 
 def generate_sentence(): 
     
     #initialize tokens
-
     interrogative_word = part_of_speech.empty_token()
     subject = part_of_speech.empty_token()
     subject.adjective = part_of_speech.empty_token()
