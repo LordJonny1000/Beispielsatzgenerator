@@ -12,7 +12,7 @@ as_list = [
 ["vernichten", "weak", 2, "accusative", ["agent", "patient"], "stay"],
 ["wandern", "weak", 1, 0, ["agent"], "move"],
 ["auflauern", "weak", 2, "dative", ["agent", "experiencer"], "stay", False],
-["spielen", "weak", 1, 0, ["agent"], "stay", True],
+["spielen", "weak", 1, 0, ["agent"], "stay", True, ["mit", "anything", "dative"]],
 ["schlafen", "strong", 1, 0, ["agent"], "stay", False, ["mit", "living_thing", "dative"]],
 ["vergeben", "strong", 2, "dative",  ["agent", "experiencer"], "stay", True],
 ["sprechen", "strong", 1, 0, ["agent"], "stay", False, ["mit", "person", "dative"]],

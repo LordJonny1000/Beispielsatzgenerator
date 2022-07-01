@@ -7,15 +7,23 @@ Created on Thu Jan 27 23:39:18 2022
 
 import random
 import numpy as np
-from vocabulary.general import verbs, prepositions, nouns
+from vocabulary.general import verbs, prepositions
 from copy import deepcopy as cp
 import part_of_speech
 import linguistics
 import utils
 from probability_settings import probability
+import json
 
 
-list_of_nouns = [part_of_speech.noun.from_list(x) for x in nouns.as_list]
+
+with open("vocabulary/general/nouns.json", encoding="utf8") as sf:
+    sd = json.load(sf)
+    list_of_nouns = list()
+    for x in sd:
+        list_of_nouns.append(part_of_speech.noun(x["word"], x["strong_or_weak"], x["genus"], x["semantic_class"], x["mass_noun"]))
+
+
 list_of_verbs = [part_of_speech.verb.from_list(x) for x in verbs.as_list]
 list_of_persons = [part_of_speech.proper_name(x[:-2], x[-1]) for x in open("vocabulary\proper_names\persons.txt", "r", encoding='utf-8').read().splitlines()]
 list_of_prepositions = [part_of_speech.preposition.from_list(x) for x in prepositions.as_list]
@@ -121,12 +129,13 @@ def generate_sentence():
             location.case = "accusative"
         location.determinative = utils.generate_determinative(location)
         #generate location adjective
+        
         if probability("location_adjective"):
             location.adjective = utils.generate_adjective(location)
     
     #individual complement
     if predicate.individual_preposition_infos[0] != None and random.randrange(2) < 1:
-        individual_preposition = utils.string_to_object(predicate.individual_preposition_infos[0])
+        individual_preposition = [x for x in list_of_prepositions if predicate.individual_preposition_infos[0]][0]
         if predicate.individual_preposition_infos[1] == "anything":
             individual_noun = cp(random.choice([random.choice(list_of_persons), random.choice(list_of_nouns), part_of_speech.pronoun("reflexive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), individual_preposition.case[0])]))
         elif predicate.individual_preposition_infos[1] == "living_thing":
@@ -216,16 +225,24 @@ def generate_sentence():
 
     #finish
     output = output[0].upper() + output[1:] + closing_punctuation_mark
-    return output, list(features.values()), vars(object1)
+    
+    
+    
+    print(type(location), vars(location.determinative), vars(location))
+    
+    return output, list(features.values())
 
 print(generate_sentence()[0])
 
 
+
+
+
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "Ein es" not in x[0]:
+#while "!!!!!!" not in x[0]:
 #   x = generate_sentence()
-#print(x)
+#print(x[0])
     
 
             

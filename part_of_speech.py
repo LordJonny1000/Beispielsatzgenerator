@@ -66,7 +66,7 @@ class adjective:
             return self.word
         else:
             return self.word
-        return self.word+"!!"#
+        return self.word+"!!!!!!!!!!!!!!!!"
 
 class noun:
     def __init__(self, word, strong_or_weak, genus, semantic_class, mass_noun = False):
@@ -79,16 +79,11 @@ class noun:
         self.person = "3rd"
         self.case = "nominative"
         self.mass_noun = mass_noun
-        self.adjective = adjective.from_string("")
+        self.adjective = proper_name('EMPTY', "neutral")
         self.determinative = article("", "", "")
         if self.mass_noun or self.word in(linguistics.nouns_without_plural_form) or self.semantic_class in("location", "event"):
             self.number = "singular"
-    @classmethod
-    def from_list(cls, list_entry):
-        if len(list_entry) == 4:
-            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3])
-        elif len(list_entry) == 5:
-            return cls(list_entry[0], list_entry[1], list_entry[2], list_entry[3], list_entry[4])
+
     def declension(self):
         if self.word == "":
             return ""

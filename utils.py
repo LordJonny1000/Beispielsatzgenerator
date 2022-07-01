@@ -1,9 +1,8 @@
-import numpy as np
+
 import random
 import linguistics
 import part_of_speech
 from copy import deepcopy as cp
-from vocabulary.general import nouns, verbs, prepositions
 
 
 
@@ -15,23 +14,12 @@ def surface(instance):
         output = instance.conjugation()
     elif type(instance) in(part_of_speech.article, part_of_speech.pronoun, part_of_speech.proper_name, part_of_speech.preposition):
         output = instance.word
+        if instance.word == "EMPTY":
+            output = ""
     elif type(instance) == str:
         return instance
     return output
     
-def string_to_object(string):#works for open classes only
-    all_words_as_objects = [part_of_speech.noun.from_list(x) for x in nouns.as_list] + [part_of_speech.verb.from_list(x) for x in verbs.as_list] + [part_of_speech.adjective(x) for x in open("vocabulary\general\\adjectives.txt", "r", encoding='utf-8').read().splitlines()]\
-        + [part_of_speech.preposition.from_list(x) for x in prepositions.as_list] \
-           + [part_of_speech.noun.from_list(x) for x in nouns.as_list if x[3] == "location"] + [part_of_speech.noun.from_list(x) for x in nouns.as_list if x[3] == "event"]
-    matches = [x for x in all_words_as_objects if x.word == string]
-    if len(matches) == 0:
-        print("Wort >" + string + "< nicht gefunden")
-        print(string)
-    elif len(matches) > 1:
-        print("es wurde mehr als ein Eintrag für >" + string + "< gefunden")
-    else:
-        return matches[0]
-
 def list_to_dict(thelist):
     word_to_id = dict()
     for n, i in enumerate(thelist):
@@ -39,21 +27,22 @@ def list_to_dict(thelist):
     return word_to_id
     
 def generate_determinative(noun):
-    if noun.word == "EMPTY":
-        return part_of_speech.proper_name('EMPTY', "neutral")
-    existing_dets = [part_of_speech.article("definite", noun.number, noun.genus, noun.case), part_of_speech.article("indefinite", noun.number, noun.genus, noun.case),\
-                     part_of_speech.pronoun("possesive", random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera),\
-                     noun.case, noun.number, noun.genus)]
-    if noun.mass_noun:
-        existing_dets.append(part_of_speech.proper_name('EMPTY', "neutral"))
-    if type(noun) == part_of_speech.noun:
-        return random.choice(existing_dets)
+    if isinstance(noun, part_of_speech.noun):
+        dets = [part_of_speech.article(random.choice(linguistics.article_types), noun.number, noun.genus, noun.case), part_of_speech.pronoun("possesive",\
+                 random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), noun.case, noun.number, noun.genus)]
+        
+        if noun.mass_noun:
+            dets.append(part_of_speech.proper_name('EMPTY', "neutral"))
+    elif isinstance(noun, part_of_speech.proper_name) and noun.word != "EMPTY" and isinstance(noun.adjective, part_of_speech.adjective):
+        dets = [part_of_speech.article(random.choice("definite"), noun.number, noun.genus, noun.case)]
     else:
-        return part_of_speech.proper_name('EMPTY', "")
-
+        dets = [part_of_speech.proper_name('EMPTY', "neutral")]
+    output = random.choice(dets)
+    return output
+#pronoun_type, person, number, genus, case, noun_number = "singular", noun_genus = "neutral"
 def generate_adjective(target):
-    if target.word == "EMPTY":
-        return part_of_speech.adjective("EMPTY")
+    if target.word in("EMPTY", "es"):
+        return part_of_speech.proper_name('EMPTY', "neutral")
     if type(target) == part_of_speech.proper_name:
         target.determinative = part_of_speech.article("definite", "singular", target.genus, target.case)
     det = target.determinative
@@ -65,4 +54,11 @@ def generate_adjective(target):
     return adjective
 
 
-
+import json
+with open("vocabulary/general/nouns.json", encoding="utf8") as sf:
+    sd = json.load(sf)
+    list_of_nouns = list()
+    for x in sd:
+        list_of_nouns.append(part_of_speech.noun(x["word"], x["strong_or_weak"], x["genus"], x["semantic_class"], x["mass_noun"]))
+noun = random.choice(list_of_nouns)
+noun.number = random.choice(linguistics.numbers)
