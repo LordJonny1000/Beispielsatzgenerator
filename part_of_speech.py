@@ -1,6 +1,16 @@
 import random
 import linguistics
 
+class empty_token():
+    def __init__(self):
+        self.word = "EMPTY"
+        self.article_type = None
+        self.person = None
+        self.number = None
+        self.semantic_class = None
+        self.determinative = None
+        
+
 class adjective:
     def __init__(self, word):
         self.word = word
@@ -79,7 +89,7 @@ class noun:
         self.person = "3rd"
         self.case = "nominative"
         self.mass_noun = mass_noun
-        self.adjective = proper_name('EMPTY', "neutral")
+        self.adjective = empty_token()
         self.determinative = article("", "", "")
         if self.mass_noun or self.word in(linguistics.nouns_without_plural_form) or self.semantic_class in("location", "event"):
             self.number = "singular"
@@ -287,12 +297,8 @@ class proper_name:
             self.genus = "masculine"
         elif self.genus == "f":
             self.genus = "feminine"
-        #for use as empty token
-        if self.word == "EMPTY":
-            self.article_type = None
-            self.person = None
-            self.number = None
-            self.semantic_class = None
+        self.determinative = empty_token()
+            
     def declension(self):
         return self.word
  
@@ -319,6 +325,7 @@ class pronoun:
             self.mass_noun = False
             self.adjective = adjective.from_string("EMPTY")
             if self.pronoun_type == "personal":
+                self.determinative = empty_token()
                 if self.number == "singular":
                     if self.person == "1st":
                         self.word =  "ich"
@@ -519,5 +526,4 @@ class article:
         if "output" not in locals():
             output = "Achtung, der Artikel konnte nicht gebildet werden!"
         self.word = output
-
 

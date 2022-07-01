@@ -12,10 +12,9 @@ def surface(instance):
         output = instance.declension()
     elif type(instance) in([part_of_speech.verb]):
         output = instance.conjugation()
-    elif type(instance) in(part_of_speech.article, part_of_speech.pronoun, part_of_speech.proper_name, part_of_speech.preposition):
+    elif type(instance) in(part_of_speech.article, part_of_speech.pronoun, part_of_speech.proper_name, part_of_speech.preposition,  part_of_speech.empty_token):
         output = instance.word
-        if instance.word == "EMPTY":
-            output = ""
+
     elif type(instance) == str:
         return instance
     return output
@@ -32,17 +31,19 @@ def generate_determinative(noun):
                  random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), noun.case, noun.number, noun.genus)]
         
         if noun.mass_noun:
-            dets.append(part_of_speech.proper_name('EMPTY', "neutral"))
-    elif isinstance(noun, part_of_speech.proper_name) and noun.word != "EMPTY" and isinstance(noun.adjective, part_of_speech.adjective):
-        dets = [part_of_speech.article(random.choice("definite"), noun.number, noun.genus, noun.case)]
+            dets.append(part_of_speech.empty_token())
+    elif isinstance(noun, part_of_speech.proper_name) and noun.word != "EMPTY":
+        dets = [part_of_speech.article("definite", noun.number, noun.genus, noun.case)]
+    
     else:
-        dets = [part_of_speech.proper_name('EMPTY', "neutral")]
+        dets = [part_of_speech.empty_token()]
     output = random.choice(dets)
     return output
-#pronoun_type, person, number, genus, case, noun_number = "singular", noun_genus = "neutral"
+
+
 def generate_adjective(target):
-    if target.word in("EMPTY", "es"):
-        return part_of_speech.proper_name('EMPTY', "neutral")
+    if target.word in("EMPTY", "es", "Es"):
+        return part_of_speech.empty_token()
     if type(target) == part_of_speech.proper_name:
         target.determinative = part_of_speech.article("definite", "singular", target.genus, target.case)
     det = target.determinative

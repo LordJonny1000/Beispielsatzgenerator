@@ -33,29 +33,28 @@ def generate_sentence():
     
     #initialize tokens
 
-    interrogative_word = part_of_speech.proper_name('EMPTY', "neutral")
-    subject = part_of_speech.proper_name('EMPTY', "neutral")
-    subject.determinative = part_of_speech.proper_name('EMPTY', "neutral")
-    subject.adjective = part_of_speech.proper_name('EMPTY', "neutral")
-    predicate = part_of_speech.proper_name('EMPTY', "neutral")
-    object1 = part_of_speech.proper_name('EMPTY', "neutral")
-    object1.determinative = part_of_speech.proper_name('EMPTY', "neutral")
-    object1.adjective = part_of_speech.proper_name('EMPTY', "neutral")
-    object2 = part_of_speech.proper_name('EMPTY', "neutral")
-    object2.determinative = part_of_speech.proper_name('EMPTY', "neutral")
-    event = part_of_speech.proper_name('EMPTY', "neutral")
-    event_preposition = part_of_speech.proper_name('EMPTY', "neutral")
-    event.determinative = part_of_speech.proper_name('EMPTY', "neutral")
-    event.adjective = part_of_speech.proper_name('EMPTY', "neutral")
-    location = part_of_speech.proper_name('EMPTY', "neutral")
-    location_preposition = part_of_speech.proper_name('EMPTY', "neutral")
-    location.determinative = part_of_speech.proper_name('EMPTY', "neutral")
-    location.adjective = part_of_speech.proper_name('EMPTY', "neutral")
-    individual_preposition = part_of_speech.proper_name('EMPTY', "neutral")
-    individual_noun = part_of_speech.proper_name('EMPTY', "neutral")
-    individual_noun.determinative = part_of_speech.proper_name('EMPTY', "neutral")
-    individual_noun.adjective = part_of_speech.proper_name('EMPTY', "neutral")
-    detached_affix_if_required = part_of_speech.proper_name('EMPTY', "neutral")
+    interrogative_word = part_of_speech.empty_token()
+    subject = part_of_speech.empty_token()
+    subject.adjective = part_of_speech.empty_token()
+    predicate = part_of_speech.empty_token()
+    object1 = part_of_speech.empty_token()
+    object1.determinative = part_of_speech.empty_token()
+    object1.adjective = part_of_speech.empty_token()
+    object2 = part_of_speech.empty_token()
+    object2.determinative = part_of_speech.empty_token()
+    event = part_of_speech.empty_token()
+    event_preposition = part_of_speech.empty_token()
+    event.determinative = part_of_speech.empty_token()
+    event.adjective = part_of_speech.empty_token()
+    location = part_of_speech.empty_token()
+    location_preposition = part_of_speech.empty_token()
+    location.determinative = part_of_speech.empty_token()
+    location.adjective = part_of_speech.empty_token()
+    individual_preposition = part_of_speech.empty_token()
+    individual_noun = part_of_speech.empty_token()
+    individual_noun.determinative = part_of_speech.empty_token()
+    individual_noun.adjective = part_of_speech.empty_token()
+    detached_affix_if_required = part_of_speech.empty_token()
     
     #set sentence mode
     x = probability("interrogative_clause")
@@ -73,15 +72,22 @@ def generate_sentence():
     #generate subject
     subject = cp(random.choice([random.choice(list_of_persons), part_of_speech.pronoun("personal", random.choice(linguistics.persons), \
                 random.choice(linguistics.numbers), random.choice(linguistics.genera), None), random.choice([x for x in list_of_nouns if x.semantic_class in("person", "animal", "mythical creature")])]))
+    subject.adjective = part_of_speech.empty_token()
     if predicate.valency == 0:
         subject = part_of_speech.proper_name("es", "neutral")
     subject.case = "nominative"
-    subject.determinative = utils.generate_determinative(subject)
+    if isinstance(subject, part_of_speech.noun):
+        subject.determinative = random.choice([part_of_speech.article(random.choice(linguistics.article_types), subject.number, subject.genus, subject.case), part_of_speech.pronoun("possesive",\
+                 random.choice(linguistics.persons), random.choice(linguistics.numbers), random.choice(linguistics.genera), subject.case, subject.number, subject.genus)])
+    
+    
     predicate.person, predicate.number = subject.person, subject.number
     
     #generate subject adjective
     if probability("subject_adjective") and predicate.valency != 0 and type(subject) != part_of_speech.pronoun:
         subject.adjective = utils.generate_adjective(subject) 
+    if isinstance(subject, part_of_speech.proper_name) and subject.word not in("es", "Es", "EMPTY") and isinstance(subject.adjective, part_of_speech.adjective):
+        subject.determinative = part_of_speech.article("definite", subject.number, subject.genus, subject.case)
 
     #generate object1 if valency >= 2
     if predicate.valency >= 2:
@@ -226,10 +232,7 @@ def generate_sentence():
     #finish
     output = output[0].upper() + output[1:] + closing_punctuation_mark
     
-    
-    
-    print(type(location), vars(location.determinative), vars(location))
-    
+
     return output, list(features.values())
 
 print(generate_sentence()[0])
@@ -240,7 +243,7 @@ print(generate_sentence()[0])
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "!!!!!!" not in x[0]:
+#while "Achtung, der Artikel konnte nicht gebildet werden!" not in x[0]:
 #   x = generate_sentence()
 #print(x[0])
     
