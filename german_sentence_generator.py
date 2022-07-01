@@ -6,7 +6,6 @@ Created on Thu Jan 27 23:39:18 2022
 """
 
 import random
-import numpy as np
 from copy import deepcopy as cp
 import part_of_speech
 import linguistics
@@ -40,28 +39,9 @@ list_of_persons = [part_of_speech.proper_name(x[:-2], x[-1]) for x in open("voca
 def generate_sentence(): 
     
     #initialize tokens
-    interrogative_word = part_of_speech.empty_token()
-    subject = part_of_speech.empty_token()
-    subject.adjective = part_of_speech.empty_token()
-    predicate = part_of_speech.empty_token()
-    object1 = part_of_speech.empty_token()
-    object1.determinative = part_of_speech.empty_token()
-    object1.adjective = part_of_speech.empty_token()
-    object2 = part_of_speech.empty_token()
-    object2.determinative = part_of_speech.empty_token()
-    event = part_of_speech.empty_token()
-    event_preposition = part_of_speech.empty_token()
-    event.determinative = part_of_speech.empty_token()
-    event.adjective = part_of_speech.empty_token()
-    location = part_of_speech.empty_token()
-    location_preposition = part_of_speech.empty_token()
-    location.determinative = part_of_speech.empty_token()
-    location.adjective = part_of_speech.empty_token()
-    individual_preposition = part_of_speech.empty_token()
-    individual_noun = part_of_speech.empty_token()
-    individual_noun.determinative = part_of_speech.empty_token()
-    individual_noun.adjective = part_of_speech.empty_token()
-    detached_affix_if_required = part_of_speech.empty_token()
+    interrogative_word = subject = subject.adjective = predicate = object1 = object1.determinative = object1.adjective = object2 = object2.determinative = event = \
+    event_preposition = event.determinative = event.adjective = location = location_preposition = location.determinative = location.adjective = individual_preposition = \
+    individual_noun = individual_noun.determinative = individual_noun.adjective = detached_affix_if_required = part_of_speech.empty_token()
     
     #set sentence mode
     x = probability("interrogative_clause")
@@ -93,8 +73,6 @@ def generate_sentence():
     #generate subject adjective
     if probability("subject_adjective") and predicate.valency != 0 and type(subject) != part_of_speech.pronoun:
         subject.adjective = utils.generate_adjective(subject) 
-    if isinstance(subject, part_of_speech.proper_name) and subject.word not in("es", "Es", "EMPTY") and isinstance(subject.adjective, part_of_speech.adjective):
-        subject.determinative = part_of_speech.article("definite", subject.number, subject.genus, subject.case)
 
     #generate object1 if valency >= 2
     if predicate.valency >= 2:
@@ -207,7 +185,7 @@ def generate_sentence():
             interrogative_word = part_of_speech.proper_name(interrogative_word, None)
     sentence_list = [interrogative_word] + sentence_list
     
-    features = {"interrogative_word":interrogative_word, "sentence_mode":sentence_mode, "subject.determinative.article_type":subject.determinative.article_type, "subject.adjective.word":subject.adjective.word,\
+    features = {"interrogative_word":interrogative_word.word, "sentence_mode":sentence_mode, "subject.determinative.article_type":subject.determinative.article_type, "subject.adjective.word":subject.adjective.word,\
                 "subject.word":subject.word, "subject.number":subject.number, "predicate.word":predicate.word, "object1.determinative.article_type":object1.determinative.article_type,\
                 "object1.adjective.word":object1.adjective.word, "object1.word":object1.word, "object1.number":object1.number, \
                 "object2.determinative.article_type":object2.determinative.article_type, \
@@ -219,7 +197,7 @@ def generate_sentence():
                 "individual_noun.word":individual_noun.word, "individual_noun.number":individual_noun.number}
     
     #surface transformation
-    output = " ".join([utils.surface(x) for x in sentence_list if len(x.word) > 0 and x.word != "EMPTY"])
+    output = " ".join([utils.surface(x) for x in sentence_list if x.word and not isinstance(x, part_of_speech.empty_token)])
     
     #contraction               
     counter = 0
@@ -240,9 +218,15 @@ def generate_sentence():
     output = output[0].upper() + output[1:] + closing_punctuation_mark
     
 
-    return output, list(features.values())
 
-print(generate_sentence()[0])
+    return output, list(features.values())
+    
+
+        
+#print(generate_sentence()[0])
+
+for x in range(1000):
+    generate_sentence()
 
 
 
@@ -250,9 +234,9 @@ print(generate_sentence()[0])
 
 #pseudo function for reproducing error
 #x = generate_sentence()
-#while "Achtung, der Artikel konnte nicht gebildet werden!" not in x[0]:
+#while "frech Einhörner" not in x[0]:
 #   x = generate_sentence()
-#print(x[0])
+#print(x)
     
 
             

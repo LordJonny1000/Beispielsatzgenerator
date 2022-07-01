@@ -4,11 +4,11 @@ import linguistics
 class empty_token():
     def __init__(self):
         self.word = "EMPTY"
-        self.article_type = None
-        self.person = None
-        self.number = None
-        self.semantic_class = None
-        self.determinative = None
+        self.article_type = "EMPTY"
+        self.person = "EMPTY"
+        self.number = "EMPTY"
+        self.semantic_class = "EMPTY"
+        self.determinative = "EMPTY"
         
 
 class adjective:
@@ -289,7 +289,7 @@ class proper_name:
         self.word = word
         self.person = "3rd"
         self.number = "singular"
-        self.adjective = adjective.from_string("EMPTY")
+        self.adjective = empty_token()
         self.semantic_class = "person"
         self.mass_noun = False
         self.genus = genus
@@ -323,7 +323,7 @@ class pronoun:
             self.noun_genus = noun_genus
             self.semantic_class = None
             self.mass_noun = False
-            self.adjective = adjective.from_string("EMPTY")
+            self.adjective = empty_token()
             if self.pronoun_type == "personal":
                 self.determinative = empty_token()
                 if self.number == "singular":

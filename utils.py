@@ -32,8 +32,11 @@ def generate_determinative(noun):
         
         if noun.mass_noun:
             dets.append(part_of_speech.empty_token())
-    elif isinstance(noun, part_of_speech.proper_name) and noun.word != "EMPTY":
-        dets = [part_of_speech.article("definite", noun.number, noun.genus, noun.case)]
+    elif isinstance(noun, part_of_speech.proper_name):
+        if isinstance(noun.adjective, part_of_speech.adjective):
+            dets = [part_of_speech.article("definite", noun.number, noun.genus, noun.case)]
+        else:
+            dets = [part_of_speech.empty_token()]
     
     else:
         dets = [part_of_speech.empty_token()]
@@ -47,8 +50,8 @@ def generate_adjective(target):
     if type(target) == part_of_speech.proper_name:
         target.determinative = part_of_speech.article("definite", "singular", target.genus, target.case)
     det = target.determinative
-    adjective = part_of_speech.adjective("EMPTY")
-    if target.word == "" or type(target) == part_of_speech.pronoun:
+    adjective = part_of_speech.empty_token()
+    if isinstance(target, part_of_speech.pronoun):
         return adjective
     adjective = cp(random.choice([part_of_speech.adjective(x) for x in open("vocabulary\general\\adjectives.txt", "r", encoding='utf-8').read().splitlines()]))
     adjective.genus, adjective.case, adjective.number, adjective.article_type = target.genus, target.case, target.number, det.article_type
